@@ -12,10 +12,6 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "trae-api-cn.mchost.guru",
-      },
-      {
-        protocol: "https",
         hostname: "m.media-amazon.com",
       },
       {

@@ -27,7 +27,7 @@ type Slide = {
 const SLIDES: Slide[] = [
   {
     image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=an%20elegant%20wrapped%20gift%20box%20with%20brown%20ribbon%20on%20a%20cream%20linen%20background%2C%20soft%20morning%20light%2C%20editorial%20still%20life%20photography%2C%20muted%20warm%20tones&image_size=landscape_4_3",
+      "https://images.unsplash.com/photo-1513885536-7c3e8c2c3f5e?w=800&h=600&fit=crop&q=80",
     caption: "A gift, truly chosen",
     plate: "Plate 01",
     float1: {
@@ -44,7 +44,7 @@ const SLIDES: Slide[] = [
   },
   {
     image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20ceramic%20pour-over%20coffee%20dripper%20with%20carafe%20on%20a%20wooden%20table%2C%20steam%20rising%2C%20warm%20morning%20light%2C%20editorial%20product%20photography&image_size=landscape_4_3",
+      "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&h=600&fit=crop&q=80",
     caption: "Slow mornings, kept",
     plate: "Plate 02",
     float1: {
@@ -61,7 +61,7 @@ const SLIDES: Slide[] = [
   },
   {
     image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20slim%20leather%20card%20wallet%20in%20tan%20brown%20on%20a%20cream%20background%2C%20editorial%20product%20photography%2C%20soft%20shadows&image_size=landscape_4_3",
+      "https://images.unsplash.com/photo-1627123424574-724758594e93?w=800&h=600&fit=crop&q=80",
     caption: "Small things, well made",
     plate: "Plate 03",
     float1: {

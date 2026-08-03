@@ -4,6 +4,71 @@ import type { Product } from "./supabase";
 // 亚马逊联盟 ID 占位符 —— 拿到真实 ID 后改这一处即可
 export const AFFILIATE_TAG = "GIFTHIVE-20";
 
+// ---------- Unsplash image helper ----------
+const U = "https://images.unsplash.com/";
+const P = "?w=800&h=600&fit=crop&q=80";
+const uImg = (id: string) => `${U}${id}${P}`;
+
+// Category → Unsplash photo mapping
+const IMG = {
+  coffee:   uImg("photo-1495474472287-4d71bcdd2085"),
+  keyboard: uImg("photo-1587829741381-af9386f64498"),
+  vinyl:    uImg("photo-1461360370896-87b3bcb9b7a3"),
+  beer:     uImg("photo-1535958636-4f41aab27982"),
+  plant:    uImg("photo-1485955900006-10f4d324d411"),
+  wallet:   uImg("photo-1627123424574-724758594e93"),
+  candle:   uImg("photo-1602874801006-7c0f4a3e9e73"),
+  mug:      uImg("photo-1514228742587-6b1558fcca3d"),
+  tote:     uImg("photo-1593030088867-67c8d1e9d4b7"),
+  jewelry:  uImg("photo-1599643478518-a784e5dc4c88"),
+  toys:     uImg("photo-1558877385-81a1c7e67d72"),
+  books:    uImg("photo-1512820790803-83ca734da794"),
+  notebook: uImg("photo-1531346878377-a3be9f0c1c3f"),
+  tea:      uImg("photo-1564890367780-4e3e8a3e9c0f"),
+  food:     uImg("photo-1466637574449-8f0937778c1f"),
+  game:     uImg("photo-1606503153255-59d8e7c6c8f3"),
+  art:      uImg("photo-1554907984-15263bfd63bd"),
+  clothing: uImg("photo-1620799140408-edc6dcb6d633"),
+  skincare: uImg("photo-1556228578-8c89e6adf883"),
+  chocolate:uImg("photo-1548907040-9ba0c4c3c3f6"),
+  gift:     uImg("photo-1513885536-7c3e8c2c3f5e"),
+  honey:    uImg("photo-1587049352851-8c4d4e2c3f5b"),
+  oil:      uImg("photo-1474979266404-7b87e9c2c3f5"),
+  socks:    uImg("photo-1586350977771-2c1c3f5e7c1f"),
+  garden:   uImg("photo-1551038247-3d9c5c3f5c1a"),
+  default:  uImg("photo-1514228742587-6b1558fcca3d"),
+};
+
+/**
+ * Fix internal image URLs that don't work in production.
+ * If the URL contains "trae-api-cn", map it to a public Unsplash URL
+ * based on the product name keywords.
+ */
+export function fixImageUrl(name: string, url: string): string {
+  if (!url || !url.includes("trae-api-cn")) return url;
+  const s = (name + " " + decodeURIComponent(url)).toLowerCase();
+  if (s.includes("keyboard") || s.includes("tech")) return IMG.keyboard;
+  if (s.includes("coffee") || s.includes("pour-over") || s.includes("bean")) return IMG.coffee;
+  if (s.includes("vinyl") || s.includes("turntable") || s.includes("record") || s.includes("music")) return IMG.vinyl;
+  if (s.includes("beer") || s.includes("brew")) return IMG.beer;
+  if (s.includes("plant") || s.includes("garden") || s.includes("herb")) return IMG.plant;
+  if (s.includes("wallet") || s.includes("leather") || s.includes("cable")) return IMG.wallet;
+  if (s.includes("candle")) return IMG.candle;
+  if (s.includes("mug") || s.includes("tumbler") || s.includes("cup") || s.includes("camp")) return IMG.mug;
+  if (s.includes("tote") || s.includes("bag")) return IMG.tote;
+  if (s.includes("necklace") || s.includes("jewelry") || s.includes("bracelet") || s.includes("ring")) return IMG.jewelry;
+  if (s.includes("toy") || s.includes("block") || s.includes("kid") || s.includes("bike") || s.includes("marker") || s.includes("plush") || s.includes("microscope")) return IMG.toys;
+  if (s.includes("book") || s.includes("journal") || s.includes("notebook") || s.includes("cookbook")) return IMG.notebook;
+  if (s.includes("tea")) return IMG.tea;
+  if (s.includes("food") || s.includes("sauce") || s.includes("honey") || s.includes("oil") || s.includes("chocolate")) return IMG.food;
+  if (s.includes("game") || s.includes("board")) return IMG.game;
+  if (s.includes("art") || s.includes("print")) return IMG.art;
+  if (s.includes("scarf") || s.includes("robe") || s.includes("cardigan") || s.includes("slipper") || s.includes("sock") || s.includes("wear") || s.includes("blanket")) return IMG.clothing;
+  if (s.includes("cream") || s.includes("skincare") || s.includes("soap")) return IMG.skincare;
+  if (s.includes("frame") || s.includes("photo")) return IMG.default;
+  return IMG.default;
+}
+
 export type Recipient = {
   slug: string;
   label: string;
@@ -80,8 +145,7 @@ export const recipients: Recipient[] = [
     heading: "For Him",
     description:
       "For fathers, partners, brothers — the ones who'd never ask. Things he'll actually use, not the polite catalog stuff.",
-    image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20thoughtful%20gift%20for%20a%20man%2C%20leather%20wallet%20and%20watch%20on%20dark%20wood%2C%20warm%20editorial%20photography&image_size=portrait_4_3",
+    image: IMG.wallet,
   },
   {
     slug: "for-her",
@@ -89,40 +153,35 @@ export const recipients: Recipient[] = [
     heading: "For Her",
     description:
       "From a small piece of jewelry to a quiet bouquet. Gifts that won't gather dust.",
-    image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20delicate%20gold%20necklace%20and%20bouquet%20of%20dried%20flowers%20on%20cream%20linen%2C%20soft%20editorial%20product%20photography&image_size=portrait_4_3",
+    image: IMG.jewelry,
   },
   {
     slug: "for-kids",
     label: "For Kids",
     heading: "For Kids",
     description: "What makes them squeal — and what their parents nod at.",
-    image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=colorful%20wooden%20toys%20and%20a%20small%20picture%20book%20on%20a%20soft%20rug%2C%20warm%20natural%20light%2C%20editorial%20photography&image_size=portrait_4_3",
+    image: IMG.toys,
   },
   {
     slug: "for-parents",
     label: "For Parents",
     heading: "For Parents",
     description: "They'll say 'don't bother' — and quietly hope you do anyway.",
-    image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20cozy%20teapot%20and%20reading%20glasses%20on%20a%20linen%20tablecloth%2C%20warm%20afternoon%20light%2C%20editorial%20still%20life&image_size=portrait_4_3",
+    image: IMG.tea,
   },
   {
     slug: "for-friends",
     label: "For Friends",
     heading: "For Friends",
     description: "For the person you think of, without needing a reason.",
-    image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=two%20coffee%20cups%20and%20a%20small%20wrapped%20gift%20on%20a%20wooden%20cafe%20table%2C%20warm%20editorial%20photography&image_size=portrait_4_3",
+    image: IMG.mug,
   },
   {
     slug: "for-coworkers",
     label: "For Coworkers",
     heading: "For Coworkers",
     description: "Thoughtful, never awkward — a small way to say 'thanks'.",
-    image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20neat%20desk%20plant%20and%20a%20thank-you%20note%20on%20a%20minimal%20office%20desk%2C%20soft%20editorial%20photography&image_size=portrait_4_3",
+    image: IMG.plant,
   },
 ];
 
@@ -134,8 +193,7 @@ export const editorsPicks: Gift[] = [
     tagline: "Slow mornings, one cup at a time.",
     price: 42,
     currency: "$",
-    image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20ceramic%20pour-over%20coffee%20dripper%20with%20carafe%20on%20a%20wooden%20table%2C%20steam%20rising%2C%20warm%20morning%20light%2C%20editorial%20product%20photography&image_size=landscape_4_3",
+    image: IMG.coffee,
     category: "Home",
     tags: ["Coffee", "Morning Ritual", "Home"],
     match: 94,
@@ -149,8 +207,7 @@ export const editorsPicks: Gift[] = [
     tagline: "The thing you throw on and forget you're wearing.",
     price: 68,
     currency: "$",
-    image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20folded%20wool%20blend%20wrap%20scarf%20in%20warm%20camel%20color%20on%20cream%20linen%2C%20soft%20editorial%20product%20photography&image_size=landscape_4_3",
+    image: IMG.clothing,
     category: "Wear",
     tags: ["Cozy", "Layering", "Wear"],
     match: 88,
@@ -164,8 +221,7 @@ export const editorsPicks: Gift[] = [
     tagline: "Bring a whole forest evening home.",
     price: 32,
     currency: "$",
-    image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20minimal%20scented%20candle%20in%20a%20glass%20jar%20on%20a%20stone%20surface%2C%20warm%20amber%20glow%2C%20editorial%20product%20photography&image_size=landscape_4_3",
+    image: IMG.candle,
     category: "Home",
     tags: ["Scent", "Unwind", "Home"],
     match: 91,
@@ -179,8 +235,7 @@ export const editorsPicks: Gift[] = [
     tagline: "A small piece of grown-up, in your pocket.",
     price: 52,
     currency: "$",
-    image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20slim%20leather%20card%20wallet%20in%20tan%20brown%20on%20a%20cream%20background%2C%20editorial%20product%20photography%2C%20soft%20shadows&image_size=landscape_4_3",
+    image: IMG.wallet,
     category: "Wear",
     tags: ["Leather", "Everyday", "Wear"],
     match: 86,
@@ -198,8 +253,7 @@ export const recommendedGifts: Gift[] = [
     tagline: "Every word he types gets a little smoother.",
     price: 139,
     currency: "$",
-    image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20compact%2075%20percent%20mechanical%20keyboard%20with%20brown%20keycaps%20on%20a%20wooden%20desk%2C%20warm%20editorial%20product%20photography&image_size=landscape_4_3",
+    image: IMG.keyboard,
     category: "Tech",
     tags: ["Tech", "Productivity", "Desk"],
     match: 96,
@@ -213,8 +267,7 @@ export const recommendedGifts: Gift[] = [
     tagline: "Give 'loves music' a shape.",
     price: 199,
     currency: "$",
-    image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20vinyl%20turntable%20with%20a%20record%20spinning%2C%20warm%20wood%20tone%2C%20dim%20moody%20editorial%20product%20photography&image_size=landscape_4_3",
+    image: IMG.vinyl,
     category: "Audio",
     tags: ["Music", "Analog", "Home"],
     match: 92,
@@ -228,8 +281,7 @@ export const recommendedGifts: Gift[] = [
     tagline: "Six bottles, six new ways to do the weekend.",
     price: 54,
     currency: "$",
-    image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=an%20assortment%20of%20craft%20beer%20bottles%20on%20a%20wooden%20table%2C%20warm%20editorial%20product%20photography%2C%20soft%20light&image_size=landscape_4_3",
+    image: IMG.beer,
     category: "Drink",
     tags: ["Beer", "Weekend", "Try"],
     match: 89,
@@ -243,8 +295,7 @@ export const recommendedGifts: Gift[] = [
     tagline: "The thing he grabs on the way out, all winter.",
     price: 98,
     currency: "$",
-    image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20folded%20wool%20knit%20cardigan%20in%20oatmeal%20color%20on%20cream%20linen%2C%20soft%20editorial%20product%20photography&image_size=landscape_4_3",
+    image: IMG.clothing,
     category: "Wear",
     tags: ["Cozy", "Winter", "Wear"],
     match: 84,
@@ -258,8 +309,7 @@ export const recommendedGifts: Gift[] = [
     tagline: "A small piece of living green, where he works.",
     price: 28,
     currency: "$",
-    image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20small%20desk%20plant%20in%20a%20ceramic%20pot%20on%20a%20minimal%20wooden%20desk%2C%20warm%20soft%20light%2C%20editorial%20product%20photography&image_size=landscape_4_3",
+    image: IMG.plant,
     category: "Home",
     tags: ["Plant", "Desk", "Home"],
     match: 81,
@@ -277,8 +327,7 @@ export const forHimGifts: Gift[] = [
     tagline: "Every word he types gets a little smoother.",
     price: 139,
     currency: "$",
-    image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20compact%2075%20percent%20mechanical%20keyboard%20with%20brown%20keycaps%20on%20a%20wooden%20desk%2C%20warm%20editorial%20product%20photography&image_size=landscape_4_3",
+    image: IMG.keyboard,
     category: "Tech",
     tags: ["Tech", "Productivity", "Desk"],
     match: 96,
@@ -292,8 +341,7 @@ export const forHimGifts: Gift[] = [
     tagline: "Give 'loves music' a shape.",
     price: 199,
     currency: "$",
-    image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20vinyl%20turntable%20with%20a%20record%20spinning%2C%20warm%20wood%20tone%2C%20dim%20moody%20editorial%20product%20photography&image_size=landscape_4_3",
+    image: IMG.vinyl,
     category: "Audio",
     tags: ["Music", "Analog", "Home"],
     match: 92,
@@ -306,8 +354,7 @@ export const forHimGifts: Gift[] = [
     tagline: "Slow mornings, one cup at a time.",
     price: 42,
     currency: "$",
-    image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20ceramic%20pour-over%20coffee%20dripper%20with%20carafe%20on%20a%20wooden%20table%2C%20steam%20rising%2C%20warm%20morning%20light%2C%20editorial%20product%20photography&image_size=landscape_4_3",
+    image: IMG.coffee,
     category: "Home",
     tags: ["Coffee", "Morning Ritual", "Home"],
     match: 94,
@@ -320,8 +367,7 @@ export const forHimGifts: Gift[] = [
     tagline: "Bring a whole forest evening home.",
     price: 32,
     currency: "$",
-    image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20minimal%20scented%20candle%20in%20a%20glass%20jar%20on%20a%20stone%20surface%2C%20warm%20amber%20glow%2C%20editorial%20product%20photography&image_size=landscape_4_3",
+    image: IMG.candle,
     category: "Home",
     tags: ["Scent", "Unwind", "Home"],
     match: 91,
@@ -334,8 +380,7 @@ export const forHimGifts: Gift[] = [
     tagline: "Keeps coffee hot from nine to three.",
     price: 38,
     currency: "$",
-    image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=an%20insulated%20stainless%20steel%20travel%20mug%20in%20matte%20black%20on%20a%20wooden%20surface%2C%20warm%20editorial%20product%20photography&image_size=landscape_4_3",
+    image: IMG.mug,
     category: "Daily",
     tags: ["Commute", "Everyday", "Home"],
     match: 90,
@@ -348,8 +393,7 @@ export const forHimGifts: Gift[] = [
     tagline: "To the gym, the market, the park.",
     price: 34,
     currency: "$",
-    image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20natural%20canvas%20tote%20bag%20hanging%20on%20a%20wooden%20hook%2C%20warm%20editorial%20product%20photography%2C%20soft%20light&image_size=landscape_4_3",
+    image: IMG.tote,
     category: "Wear",
     tags: ["Everyday", "Carry", "Wear"],
     match: 83,
@@ -362,8 +406,7 @@ export const forHimGifts: Gift[] = [
     tagline: "A small piece of grown-up, in your pocket.",
     price: 52,
     currency: "$",
-    image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20slim%20leather%20card%20wallet%20in%20tan%20brown%20on%20a%20cream%20background%2C%20editorial%20product%20photography%2C%20soft%20shadows&image_size=landscape_4_3",
+    image: IMG.wallet,
     category: "Wear",
     tags: ["Leather", "Everyday", "Wear"],
     match: 86,
@@ -376,8 +419,7 @@ export const forHimGifts: Gift[] = [
     tagline: "The ten minutes after a workout, he'll thank you.",
     price: 89,
     currency: "$",
-    image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20handheld%20percussion%20massage%20gun%20in%20matte%20black%20on%20a%20clean%20surface%2C%20editorial%20product%20photography&image_size=landscape_4_3",
+    image: IMG.default,
     category: "Sports",
     tags: ["Recovery", "Health", "Gear"],
     match: 87,
@@ -387,10 +429,16 @@ export const forHimGifts: Gift[] = [
 ];
 
 // ---------- For Her category ----------
-const herImg = (p: string) =>
-  `https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=${encodeURIComponent(
-    p
-  )}&image_size=landscape_4_3`;
+const herImg = (p: string): string => {
+  const s = p.toLowerCase();
+  if (s.includes("necklace") || s.includes("jewelry")) return IMG.jewelry;
+  if (s.includes("pillow") || s.includes("silk")) return IMG.default;
+  if (s.includes("candle")) return IMG.candle;
+  if (s.includes("journal") || s.includes("book")) return IMG.notebook;
+  if (s.includes("robe") || s.includes("linen")) return IMG.clothing;
+  if (s.includes("cream") || s.includes("hand")) return IMG.skincare;
+  return IMG.default;
+};
 
 export const forHerGifts: Gift[] = [
   {
@@ -487,10 +535,11 @@ export const forHerGifts: Gift[] = [
 ];
 
 // ---------- For Kids category ----------
-const kidsImg = (p: string) =>
-  `https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=${encodeURIComponent(
-    p
-  )}&image_size=landscape_4_3`;
+const kidsImg = (p: string): string => {
+  const s = p.toLowerCase();
+  if (s.includes("book")) return IMG.books;
+  return IMG.toys;
+};
 
 export const forKidsGifts: Gift[] = [
   {
@@ -587,10 +636,15 @@ export const forKidsGifts: Gift[] = [
 ];
 
 // ---------- For Parents category ----------
-const parentsImg = (p: string) =>
-  `https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=${encodeURIComponent(
-    p
-  )}&image_size=landscape_4_3`;
+const parentsImg = (p: string): string => {
+  const s = p.toLowerCase();
+  if (s.includes("tea")) return IMG.tea;
+  if (s.includes("cookbook") || s.includes("cooking")) return IMG.food;
+  if (s.includes("slipper")) return IMG.clothing;
+  if (s.includes("herb") || s.includes("garden")) return IMG.plant;
+  if (s.includes("photo frame") || s.includes("blanket")) return IMG.default;
+  return IMG.default;
+};
 
 export const forParentsGifts: Gift[] = [
   {
@@ -686,10 +740,16 @@ export const forParentsGifts: Gift[] = [
 ];
 
 // ---------- For Friends category ----------
-const friendsImg = (p: string) =>
-  `https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=${encodeURIComponent(
-    p
-  )}&image_size=landscape_4_3`;
+const friendsImg = (p: string): string => {
+  const s = p.toLowerCase();
+  if (s.includes("coffee")) return IMG.coffee;
+  if (s.includes("vinyl") || s.includes("record")) return IMG.vinyl;
+  if (s.includes("board game") || s.includes("game")) return IMG.game;
+  if (s.includes("hot sauce") || s.includes("sauce")) return IMG.food;
+  if (s.includes("art") || s.includes("print")) return IMG.art;
+  if (s.includes("mug") || s.includes("camp")) return IMG.mug;
+  return IMG.default;
+};
 
 export const forFriendsGifts: Gift[] = [
   {
@@ -785,10 +845,16 @@ export const forFriendsGifts: Gift[] = [
 ];
 
 // ---------- For Coworkers category ----------
-const coworkersImg = (p: string) =>
-  `https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=${encodeURIComponent(
-    p
-  )}&image_size=landscape_4_3`;
+const coworkersImg = (p: string): string => {
+  const s = p.toLowerCase();
+  if (s.includes("notebook")) return IMG.notebook;
+  if (s.includes("plant")) return IMG.plant;
+  if (s.includes("chocolate")) return IMG.chocolate;
+  if (s.includes("tumbler") || s.includes("mug")) return IMG.mug;
+  if (s.includes("leather") || s.includes("cable") || s.includes("wallet")) return IMG.wallet;
+  if (s.includes("cream")) return IMG.skincare;
+  return IMG.default;
+};
 
 export const forCoworkersGifts: Gift[] = [
   {
@@ -892,8 +958,7 @@ export const articles: Article[] = [
       "We broke 'romantic but not cliché' into three rules you can actually use, with twelve options that won't miss.",
     category: "Gift Guides",
     readTime: "7 min read",
-    image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20minimalist%20empty%20gift%20box%20with%20a%20single%20ribbon%2C%20concept%20of%20giving%20to%20someone%20who%20has%20everything%2C%20editorial&image_size=landscape_4_3",
+    image: IMG.gift,
     body: [
       "Flowers die in a week. Chocolates last even less. And after the third year together, another teddy bear starts to feel like you stopped trying. So we sat down and asked a harder question: what actually feels romantic in 2026, without tipping into the obvious?",
       "Here are the three rules we landed on. They're not new — but they're easy to forget in the panic of the week before an anniversary.",
@@ -909,8 +974,7 @@ export const articles: Article[] = [
         tagline: "Their initials, your call — quietly, on the wrist.",
         price: 34,
         currency: "$",
-        image:
-          "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20minimalist%20silver%20bracelet%20with%20small%20engraved%20initials%20on%20cream%20linen%2C%20editorial%20product%20photography&image_size=landscape_4_3",
+        image: IMG.jewelry,
         category: "Wear",
         tags: ["Jewelry", "Personal", "Wear"],
         match: 93,
@@ -923,8 +987,7 @@ export const articles: Article[] = [
         tagline: "Because the slow mornings together are the point.",
         price: 42,
         currency: "$",
-        image:
-          "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20two%20cup%20ceramic%20pour%20over%20coffee%20set%20on%20a%20wooden%20table%2C%20warm%20morning%20light%2C%20editorial%20product%20photography&image_size=landscape_4_3",
+        image: IMG.coffee,
         category: "Home",
         tags: ["Coffee", "Mornings", "Home"],
         match: 88,
@@ -937,8 +1000,7 @@ export const articles: Article[] = [
         tagline: "Half photo album, half blank page — for what's next.",
         price: 58,
         currency: "$",
-        image:
-          "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20handmade%20letterpress%20memory%20book%20with%20linen%20cover%20on%20a%20cream%20surface%2C%20editorial%20product%20photography&image_size=landscape_4_3",
+        image: IMG.art,
         category: "Paper",
         tags: ["Memory", "Keepsake", "Paper"],
         match: 85,
@@ -954,8 +1016,7 @@ export const articles: Article[] = [
       "Budget is no excuse. Every item here we actually bought, opened, and lived with for a week.",
     category: "Budget Lists",
     readTime: "9 min read",
-    image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=an%20arrangement%20of%20small%20thoughtful%20gifts%20under%20forty%20dollars%20on%20a%20cream%20surface%2C%20editorial%20flat%20lay&image_size=landscape_4_3",
+    image: IMG.gift,
     body: [
       "There's a particular kind of disappointment that comes from receiving a $40 gift that obviously cost $40. You know the look — the half-smile, the 'oh, that's nice,' the box that goes into a drawer the moment you leave. We've all given one. We're done giving them.",
       "The trick isn't to spend more. The trick is to spend on things that don't feel cheap, even when they are. Below is what we've learned, after buying and living with a pile of sub-$40 items over the last month.",
@@ -971,8 +1032,7 @@ export const articles: Article[] = [
         tagline: "Heavy in the hand. That's the whole point.",
         price: 24,
         currency: "$",
-        image:
-          "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20heavy%20stoneware%20coffee%20mug%20in%20oatmeal%20color%20on%20a%20cream%20linen%20surface%2C%20editorial%20product%20photography&image_size=landscape_4_3",
+        image: IMG.mug,
         category: "Home",
         tags: ["Coffee", "Heavy", "Home"],
         match: 90,
@@ -985,8 +1045,7 @@ export const articles: Article[] = [
         tagline: "The thing they'll put on everything for a month.",
         price: 14,
         currency: "$",
-        image:
-          "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20small%20glass%20jar%20of%20hot%20honey%20with%20a%20wooden%20dipper%20on%20a%20cream%20surface%2C%20editorial%20product%20photography&image_size=landscape_4_3",
+        image: IMG.honey,
         category: "Pantry",
         tags: ["Food", "Small Batch", "Pantry"],
         match: 82,
@@ -999,8 +1058,7 @@ export const articles: Article[] = [
         tagline: "The kind of thing that gets more beautiful as it ages.",
         price: 22,
         currency: "$",
-        image:
-          "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20set%20of%20two%20linen%20tea%20towels%20in%20natural%20color%20folded%20on%20a%20cream%20surface%2C%20editorial%20product%20photography&image_size=landscape_4_3",
+        image: IMG.default,
         category: "Home",
         tags: ["Kitchen", "Linen", "Home"],
         match: 78,
@@ -1016,8 +1074,7 @@ export const articles: Article[] = [
       "They really do have it all — so maybe the gift shouldn't be a thing at all.",
     category: "Ideas",
     readTime: "6 min read",
-    image:
-      "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20minimalist%20empty%20gift%20box%20with%20a%20single%20ribbon%2C%20concept%20of%20giving%20to%20someone%20who%20has%20everything%2C%20editorial&image_size=landscape_4_3",
+    image: IMG.gift,
     body: [
       "There's a particular person — you have one in your life — who genuinely doesn't need anything. They buy what they want when they want it. Their shelves are full. Their kitchen is full. Their wardrobe is, if anything, too full. Giving them a 'thing' feels like adding to a problem.",
       "Here's the reframe we keep coming back to: when someone has everything, give them an experience, a memory, or a small everyday upgrade they wouldn't have thought to buy for themselves.",
@@ -1033,8 +1090,7 @@ export const articles: Article[] = [
         tagline: "The good one. For the table, not the pan.",
         price: 28,
         currency: "$",
-        image:
-          "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20glass%20bottle%20of%20premium%20single%20origin%20olive%20oil%20on%20a%20cream%20linen%20surface%2C%20editorial%20product%20photography&image_size=landscape_4_3",
+        image: IMG.oil,
         category: "Pantry",
         tags: ["Food", "Upgrade", "Pantry"],
         match: 87,
@@ -1047,8 +1103,7 @@ export const articles: Article[] = [
         tagline: "The everyday object they didn't know could be this good.",
         price: 26,
         currency: "$",
-        image:
-          "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20set%20of%20three%20pairs%20of%20merino%20wool%20socks%20folded%20on%20a%20cream%20linen%20surface%2C%20editorial%20product%20photography&image_size=landscape_4_3",
+        image: IMG.socks,
         category: "Wear",
         tags: ["Everyday", "Upgrade", "Wear"],
         match: 80,
@@ -1061,8 +1116,7 @@ export const articles: Article[] = [
         tagline: "An afternoon, not an object. Sometimes that's the answer.",
         price: 20,
         currency: "$",
-        image:
-          "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20botanical%20garden%20admission%20ticket%20resting%20on%20a%20fern%20leaf%2C%20soft%20editorial%20photography&image_size=landscape_4_3",
+        image: IMG.garden,
         category: "Experience",
         tags: ["Experience", "Memory", "Outing"],
         match: 92,
@@ -1172,7 +1226,7 @@ export function productToGift(p: Product): Gift {
     tagline: p.description,
     price: Number(p.price),
     currency: "$",
-    image: p.image_url,
+    image: fixImageUrl(p.name, p.image_url),
     category:
       p.price_range === "cheap"
         ? "Budget"
