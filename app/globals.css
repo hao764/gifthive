@@ -1,0 +1,267 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-cream text-ink font-sans antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "ss01", "cv01", "cv11";
+  }
+
+  /* 标题启用光学尺寸 + 衬线特性 */
+  .font-display {
+    font-feature-settings: "ss01", "liga", "dlig", "kern";
+    font-optical-sizing: auto;
+  }
+
+  ::selection {
+    @apply bg-ember text-cream;
+  }
+
+  /* 自定义滚动条 —— 像纸边的细线 */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #F4ECE0;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #C9A98A;
+    border-radius: 999px;
+    border: 2px solid #F4ECE0;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #D98E3F;
+  }
+}
+
+@layer components {
+  /* ============ 编辑式组件类 ============ */
+
+  /* 章节编号标记 —— No. 01 这种 */
+  .section-index {
+    @apply flex items-center gap-3 font-display text-sm text-ink/40;
+  }
+  .section-index::before {
+    content: "";
+    @apply h-px w-8 bg-ink/20;
+  }
+
+  /* 章节小标签 —— 顶部 eyebrow */
+  .eyebrow {
+    @apply inline-flex items-center gap-2.5 text-[0.68rem] font-sans font-semibold uppercase tracking-widest text-ember-deep;
+  }
+  .eyebrow::before {
+    content: "";
+    @apply h-px w-7 bg-ember-deep/50;
+  }
+  .eyebrow-center {
+    @apply justify-center;
+  }
+  .eyebrow-center::after {
+    content: "";
+    @apply h-px w-7 bg-ember-deep/50;
+  }
+
+  /* 主按钮 —— 深墨底，悬停翻为火苗橙（需配合 group 类使用） */
+  .btn-primary {
+    @apply relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full bg-ink px-7 py-3.5 text-sm font-medium text-cream transition-all duration-500 ease-editorial hover:bg-ember hover:shadow-glow focus:outline-none focus-visible:ring-2 focus-visible:ring-ember focus-visible:ring-offset-2 focus-visible:ring-offset-cream;
+  }
+  .btn-primary::before {
+    content: "";
+    @apply absolute inset-0 -z-0 translate-y-full bg-gradient-to-t from-ember-deep to-ember transition-transform duration-500 ease-editorial;
+  }
+  .btn-primary > * {
+    @apply relative z-10;
+  }
+  .btn-primary:hover::before {
+    @apply translate-y-0;
+  }
+
+  /* 次按钮 —— 线框，悬停反白（需配合 group 类使用） */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-ink/25 bg-transparent px-7 py-3.5 text-sm font-medium text-ink transition-all duration-500 ease-editorial hover:border-ink hover:bg-ink hover:text-cream;
+  }
+
+  /* 卡片底座 */
+  .surface {
+    @apply rounded-3xl border border-ink/8 bg-cream/70 backdrop-blur-sm;
+  }
+
+  /* 文章引言字号 */
+  .lede {
+    @apply text-lg leading-relaxed text-ink/75 md:text-xl md:leading-relaxed;
+  }
+
+  /* 斜体强调词 —— 编辑式口吻 */
+  .accent-italic {
+    @apply font-display italic font-normal;
+  }
+
+  /* Drop cap —— 首字下沉，杂志感 */
+  .dropcap::first-letter {
+    @apply float-left mr-3 mt-1 font-display text-[5rem] font-semibold leading-[0.8] text-ember-deep;
+  }
+
+  /* 装饰性分隔线 —— 带中央菱形 */
+  .ornament-rule {
+    @apply relative flex items-center justify-center py-6;
+  }
+  .ornament-rule::before,
+  .ornament-rule::after {
+    content: "";
+    @apply h-px flex-1 bg-ink/10;
+  }
+  .ornament-rule::before {
+    @apply mr-6;
+  }
+  .ornament-rule::after {
+    @apply ml-6;
+  }
+
+  /* 装饰跑马灯容器 */
+  .marquee-track {
+    @apply flex w-max items-center gap-0;
+    animation: marquee 40s linear infinite;
+  }
+  .marquee-track:hover {
+    animation-play-state: paused;
+  }
+
+  /* 标签药丸 —— 带前缀小点 */
+  .tag-pill {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-ink/10 bg-cream/60 px-2.5 py-1 text-[0.68rem] text-ink/60 transition-colors hover:border-ember/40 hover:text-ink;
+  }
+  .tag-pill::before {
+    content: "";
+    @apply h-1 w-1 rounded-full bg-ember/60;
+  }
+
+  /* 编号数字 —— 卡片角落的序号 */
+  .index-num {
+    @apply font-display text-xs font-medium italic text-ink/35 tabular-nums;
+  }
+
+  /* 文本下划线手写感 —— 关键词下方一道斜线 */
+  .underline-mark {
+    @apply relative inline-block;
+  }
+  .underline-mark::after {
+    content: "";
+    @apply absolute -bottom-1 left-0 h-[0.35em] w-full -skew-x-12 bg-ember/25;
+    z-index: -1;
+  }
+}
+
+@layer utilities {
+  /* ============ Apple 玻璃质感 ============ */
+  .glass {
+    background: rgba(251, 247, 242, 0.55);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    box-shadow:
+      0 1px 0 0 rgba(255, 255, 255, 0.5) inset,
+      0 8px 32px -8px rgba(42, 31, 26, 0.12);
+  }
+  .glass-dark {
+    background: rgba(42, 31, 26, 0.55);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow:
+      0 1px 0 0 rgba(255, 255, 255, 0.08) inset,
+      0 8px 32px -8px rgba(0, 0, 0, 0.3);
+  }
+  .glass-warm {
+    background: rgba(244, 236, 224, 0.5);
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow:
+      0 1px 0 0 rgba(255, 255, 255, 0.5) inset,
+      0 4px 20px -6px rgba(42, 31, 26, 0.08);
+  }
+
+  /* 纸张噪点纹理 —— 给页面一层「纸感」 */
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.5;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.16 0 0 0 0 0.12 0 0 0 0 0.10 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* 纸张纹理（更柔）用于大区块 */
+  .paper-texture {
+    background-image:
+      radial-gradient(rgba(42,31,26,0.025) 1px, transparent 1px),
+      radial-gradient(rgba(42,31,26,0.015) 1px, transparent 1px);
+    background-size: 24px 24px, 48px 48px;
+    background-position: 0 0, 12px 12px;
+  }
+
+  /* 滚动入场初始态 —— 由 Reveal 组件触发可见 */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  /* 镜像渐隐边缘 —— 跑马灯两端淡出 */
+  .mask-fade-x {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 8%,
+      black 92%,
+      transparent
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 8%,
+      black 92%,
+      transparent
+    );
+  }
+
+  /* 蜜语卡揭晓动画 */
+  .reveal-fade-in {
+    animation: reveal-fade 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes reveal-fade {
+    from {
+      opacity: 0;
+      transform: translateY(16px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+}
