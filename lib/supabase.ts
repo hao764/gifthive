@@ -163,6 +163,63 @@ export async function getAudienceGiftsFallback(
   return audienceHardcodedMap[audience] ?? [];
 }
 
+// ---------- 商品详情页：按 ASIN 查单个商品 + 相关推荐 ----------
+
+/**
+ * 按 ASIN 查单个商品（用于 /gift/[asin] 详情页）
+ * 失败返回 null
+ */
+export async function getProductByAsin(asin: string): Promise<Product | null> {
+  try {
+    const client = getClient();
+    if (!client) return null;
+    const { data, error } = await client
+      .from("products")
+      .select("*")
+      .eq("asin", asin)
+      .maybeSingle();
+    if (error) {
+      console.error("getProductByAsin error:", error.message);
+      return null;
+    }
+    return (data as Product) ?? null;
+  } catch (err) {
+    console.error("getProductByAsin failed:", err);
+    return null;
+  }
+}
+
+/**
+ * 查相关推荐：同人群标签、同场合或同价位，最多 N 条，排除当前商品
+ * 失败时返回空数组
+ */
+export async function getRelatedProducts(
+  current: Product,
+  limit = 4
+): Promise<Product[]> {
+  try {
+    const client = getClient();
+    if (!client) return [];
+    // 优先用同人群标签的第一个
+    const audience = current.audience_tags?.[0];
+    if (!audience) return [];
+    const { data, error } = await client
+      .from("products")
+      .select("*")
+      .contains("audience_tags", [audience])
+      .neq("id", current.id)
+      .limit(limit);
+    if (error) {
+      console.error("getRelatedProducts error:", error.message);
+      return [];
+    }
+    return (data as Product[]) ?? [];
+  } catch (err) {
+    console.error("getRelatedProducts failed:", err);
+    return [];
+  }
+}
+
 /**
  * 统计礼物总库真实数量：Supabase count(*) 成功就用它，失败 fallback 到 10（最少也有 10 条硬编码）
  * 用于首页 Hero 展示，避免假数字

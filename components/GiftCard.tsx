@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Gift, formatPrice, getAmazonUrl } from "@/lib/data";
 
 type Props = {
@@ -28,6 +29,7 @@ export default function GiftCard({
   // 这里手动处理：先尝试 window.open，失败回退到当前页跳转，保证按钮一定有反应。
   const handleShopClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
+    e.stopPropagation(); // 阻止冒泡到卡片 Link，避免既跳详情页又开亚马逊
     const url = getAmazonUrl(gift);
     const win = window.open(url, "_blank", "noopener,noreferrer");
     if (!win) {
@@ -35,6 +37,11 @@ export default function GiftCard({
       window.location.href = url;
     }
   };
+
+  // 详情页路径：如果有 ASIN 用 /gift/[asin]，否则用亚马逊搜索
+  const detailHref = gift.amazonUrl
+    ? `/gift/${extractAsin(gift.amazonUrl)}`
+    : null;
 
   // -------- Locked preview (share-to-unlock) --------
   if (locked) {
@@ -94,8 +101,15 @@ export default function GiftCard({
     );
   }
 
+  // 卡片容器：如果有详情页就包成 Link，否则就是普通 article
+  const Wrapper: any = detailHref ? Link : "article";
+  const wrapperProps: any = detailHref
+    ? { href: detailHref, scroll: false }
+    : {};
+
   return (
-    <article
+    <Wrapper
+      {...wrapperProps}
       className={`group relative flex flex-col overflow-hidden rounded-[1.75rem] border bg-cream-paper transition-all duration-700 ease-editorial hover:-translate-y-1.5 hover:shadow-lift ${
         featured
           ? "border-ember/30 shadow-card md:col-span-2 md:flex-row"
@@ -258,8 +272,20 @@ export default function GiftCard({
           </div>
         </div>
       </div>
-    </article>
+    </Wrapper>
   );
+}
+
+// 从亚马逊链接里提取 ASIN
+// 支持 /dp/ASIN, /gp/product/ASIN, /product/ASIN, ?asin=ASIN 等
+function extractAsin(url: string): string | null {
+  if (!url) return null;
+  const m =
+    url.match(/\/dp\/([A-Z0-9]{10})/) ||
+    url.match(/\/gp\/product\/([A-Z0-9]{10})/) ||
+    url.match(/\/product\/([A-Z0-9]{10})/) ||
+    url.match(/[?&]asin=([A-Z0-9]{10})/);
+  return m?.[1] ?? null;
 }
 
 function LockIcon() {
