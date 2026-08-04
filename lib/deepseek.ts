@@ -128,6 +128,7 @@ Return ONLY this JSON format:
         max_tokens: 1200,
         response_format: { type: "json_object" },
       }),
+      signal: AbortSignal.timeout(8000),
     });
 
     if (!response.ok) {

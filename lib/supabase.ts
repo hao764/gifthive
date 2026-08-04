@@ -1,16 +1,30 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error(
-    "缺少 Supabase 环境变量。请在项目根目录创建 .env.local 文件，填入 NEXT_PUBLIC_SUPABASE_URL 和 NEXT_PUBLIC_SUPABASE_ANON_KEY"
-  );
+// 惰性初始化 —— 环境变量缺失时不会崩溃，查询时返回 null
+let _client: SupabaseClient | null = null;
+
+function getClient(): SupabaseClient | null {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return null;
+  }
+  if (!_client) {
+    _client = createClient(supabaseUrl, supabaseAnonKey);
+  }
+  return _client;
 }
 
-// 单例 client —— 全站复用
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// 兼容旧代码的导出 —— 通过 getter 访问
+export const supabase = new Proxy({} as SupabaseClient, {
+  get(_target, prop) {
+    const client = getClient();
+    if (!client) return undefined;
+    // @ts-expect-error — proxy 透传
+    return client[prop];
+  },
+});
 
 // ---------- 商品类型 ----------
 export type Product = {
@@ -40,7 +54,11 @@ type ProductFilter = {
  * 用法：const { data, error } = await fetchProducts({ audience: "for-him", limit: 8 })
  */
 export async function fetchProducts(filter: ProductFilter = {}) {
-  let query = supabase
+  const client = getClient();
+  if (!client) {
+    return { data: null, error: { message: "Supabase not configured" } as any };
+  }
+  let query = client
     .from("products")
     .select("*")
     .order("id", { ascending: true });
@@ -151,7 +169,13 @@ export async function getAudienceGiftsFallback(
  */
 export async function getTotalGiftsCountFallback(): Promise<number> {
   try {
-    const { count, error } = await supabase
+    const client = getClient();
+    if (!client) {
+      const hardcodedTotal =
+        Object.values(audienceHardcodedMap).reduce((acc, arr) => acc + arr.length, 0);
+      return hardcodedTotal > 0 ? hardcodedTotal : 10;
+    }
+    const { count, error } = await client
       .from("products")
       .select("*", { count: "exact", head: true });
     if (!error && typeof count === "number") {
@@ -196,7 +220,9 @@ export async function createReveal(
   input: RevealInput
 ): Promise<Reveal | null> {
   try {
-    const { data, error } = await supabase
+    const client = getClient();
+    if (!client) return null;
+    const { data, error } = await client
       .from("reveals")
       .insert({
         sender_name: input.sender_name || null,
@@ -225,7 +251,9 @@ export async function createReveal(
  */
 export async function getReveal(id: string): Promise<Reveal | null> {
   try {
-    const { data, error } = await supabase
+    const client = getClient();
+    if (!client) return null;
+    const { data, error } = await client
       .from("reveals")
       .select("*")
       .eq("id", id)
@@ -246,7 +274,9 @@ export async function getReveal(id: string): Promise<Reveal | null> {
  */
 export async function markRevealed(id: string): Promise<void> {
   try {
-    await supabase
+    const client = getClient();
+    if (!client) return;
+    await client
       .from("reveals")
       .update({ revealed_at: new Date().toISOString() })
       .eq("id", id);
