@@ -27,7 +27,7 @@ type Slide = {
 const SLIDES: Slide[] = [
   {
     image:
-      "https://images.unsplash.com/photo-1513885536-7c3e8c2c3f5e?w=800&h=600&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=800&h=600&fit=crop&q=80",
     caption: "A gift, truly chosen",
     plate: "Plate 01",
     float1: {
