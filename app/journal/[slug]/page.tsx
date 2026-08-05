@@ -4,6 +4,9 @@ import GiftCard from "@/components/GiftCard";
 import Reveal from "@/components/Reveal";
 import { articles } from "@/lib/data";
 
+// Cloudflare Pages 需要 Edge Runtime
+export const runtime = "edge";
+
 type Props = { params: { slug: string } };
 
 export function generateStaticParams() {

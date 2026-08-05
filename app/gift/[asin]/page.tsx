@@ -15,9 +15,13 @@ import {
 } from "@/lib/data";
 import type { Metadata } from "next";
 
-// ---------- 静态生成：预生成所有 ASIN 的详情页 ----------
-// Next.js 会在构建时调用这个函数，把所有商品的 ASIN 都预渲染成静态页面，SEO + 访问速度都好。
-export const dynamicParams = false;
+// ---------- 静态生成 ----------
+// 构建时尽量预渲染所有 ASIN（给 SEO + CDN），但如果构建时没拿到数据库 ASIN（例如构建环境变量缺失），
+// 则允许 dynamicParams=true，让访问时再按需动态渲染（SSR），避免直接 404 "没找到有效网页"
+export const dynamicParams = true;
+export const revalidate = 86400;
+// Cloudflare Pages 需要 Edge Runtime
+export const runtime = "edge";
 
 export async function generateStaticParams() {
   // 通过 REST API 直接拿所有 ASIN，避免在 build 时依赖 Supabase JS 客户端的运行时

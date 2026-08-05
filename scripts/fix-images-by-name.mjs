@@ -39,6 +39,9 @@ const RULES = [
   [["wipes", "flushable"], "photo-1504280390367-361c6d9f38f4"],
 
   // === 工具 / 户外 ===
+  // 更具体的关键词放前面，避免被 magnetic / warmer 通用规则抢走
+  [["hand warmer", "handwarmer", "heated glove"], "photo-1629760946220-5693ee4c46ac"],
+  [["magnetic tool", "magnetic wristband", "magnetic pickup"], "photo-1504280390367-361c6d9f38f4"],
   [["magnetic", "wristband", "tool", "screwdriver"], "photo-1504280390367-361c6d9f38f4"],
   [["tire inflator", "air compressor", "air duster", "pump"], "photo-1504280390367-361c6d9f38f4"],
   [["boxing", "reflex ball", "punch"], "photo-1558877385-81a1c7e67d72"],
@@ -48,7 +51,7 @@ const RULES = [
   [["box cutter", "ceramic blade", "knife"], "photo-1504280390367-361c6d9f38f4"],
   [["stress ball", "fidget", "spinner", "squishy", "mochi"], "photo-1558877385-81a1c7e67d72"],
   [["3d pen", "3d print", "drawing pen", "lcd writing", "writing tablet", "drawing board"], "photo-1455390582262-044cdead277a"],
-  [["lunch box", "lunch bag", "warmer", "crock-pot"], "photo-1504280390367-361c6d9f38f4"],
+  [["lunch box", "lunch bag", "crock-pot electric lunch box", "electric lunch box"], "photo-1504280390367-361c6d9f38f4"],
   [["headlamp", "flashlight", "torch"], "photo-1504280390367-361c6d9f38f4"],
   [["first aid", "band-aid", "bandage"], "photo-1504280390367-361c6d9f38f4"],
   [["fan", "neck fan", "cooling"], "photo-1504280390367-361c6d9f38f4"],
@@ -63,7 +66,6 @@ const RULES = [
   [["playing cards", "cards", "card game"], "photo-1629760946220-5693ee4c46ac"],
   [["car cleaning", "cleaning gel", "putty"], "photo-1504280390367-361c6d9f38f4"],
   [["toilet spray", "poo-pourri", "bathroom"], "photo-1504280390367-361c6d9f38f4"],
-  [["hand warmer"], "photo-1504280390367-361c6d9f38f4"],
   [["magnet", "pyramid", "puzzle", "kanoodle"], "photo-1629760946220-5693ee4c46ac"],
   [["airplane", "launcher", "boomerang"], "photo-1558877385-81a1c7e67d72"],
 

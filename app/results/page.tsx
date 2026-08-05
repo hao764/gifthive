@@ -3,6 +3,9 @@ import { fetchProducts, getRecommendedGiftsFallback } from "@/lib/supabase";
 import { getAIGiftRecommendations, type AIGift } from "@/lib/deepseek";
 import { productToGift } from "@/lib/data";
 
+// Cloudflare Pages 需要 Edge Runtime
+export const runtime = "edge";
+
 export const metadata = {
   title: "Your Results — GiftHive",
   description:
