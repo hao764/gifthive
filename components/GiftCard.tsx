@@ -27,7 +27,7 @@ export default function GiftCard({
 
   // IDE 预览面板是 iframe、sandbox 禁弹窗时 target="_blank" 会被静默忽略。
   // 这里手动处理：先尝试 window.open，失败回退到当前页跳转，保证按钮一定有反应。
-  const handleShopClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleShopClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation(); // 阻止冒泡到卡片 Link，避免既跳详情页又开亚马逊
     const url = getAmazonUrl(gift);
@@ -253,10 +253,8 @@ export default function GiftCard({
               </p>
             </div>
             <div className="flex flex-col items-end gap-2">
-              <a
-                href={getAmazonUrl(gift)}
-                target="_blank"
-                rel="sponsored nofollow noopener noreferrer"
+              <button
+                type="button"
                 onClick={handleShopClick}
                 className="group/btn inline-flex items-center gap-1.5 rounded-full bg-ink px-5 py-3 text-xs font-medium text-cream transition-all duration-500 ease-editorial hover:bg-ember"
               >
@@ -264,7 +262,7 @@ export default function GiftCard({
                 <span className="transition-transform duration-500 ease-editorial group-hover/btn:translate-x-1">
                   →
                 </span>
-              </a>
+              </button>
               <p className="text-right text-[0.6rem] text-ink/40">
                 View on Amazon · new tab
               </p>

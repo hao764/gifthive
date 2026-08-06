@@ -1,5 +1,6 @@
 // Sample data — replace with a real data source later.
 import type { Product } from "./supabase";
+import { fixImageUrl } from "./images";
 
 // 亚马逊联盟 ID 占位符 —— 拿到真实 ID 后改这一处即可
 export const AFFILIATE_TAG = "GIFTHIVE-20";
@@ -11,63 +12,50 @@ const uImg = (id: string) => `${U}${id}${P}`;
 
 // Category → Unsplash photo mapping
 const IMG = {
-  coffee:   uImg("photo-1495474472287-4d71bcdd2085"),
-  keyboard: uImg("photo-1618384887929-16ec33fab9ef"),
-  vinyl:    uImg("photo-1602848597941-0d3d3a2c1241"),
-  beer:     uImg("photo-1571613316887-6f8d5cbf7ef7"),
-  plant:    uImg("photo-1485955900006-10f4d324d411"),
-  wallet:   uImg("photo-1627123424574-724758594e93"),
-  candle:   uImg("photo-1561212856-44e9bae482aa"),
-  mug:      uImg("photo-1514228742587-6b1558fcca3d"),
-  tote:     uImg("photo-1574365569389-a10d488ca3fb"),
-  jewelry:  uImg("photo-1601121141461-9d6647bca1ed"),
-  toys:     uImg("photo-1558877385-81a1c7e67d72"),
-  books:    uImg("photo-1512820790803-83ca734da794"),
-  notebook: uImg("photo-1501618669935-18b6ecb13d6d"),
-  tea:      uImg("photo-1610478506025-8110cc8f1986"),
-  food:     uImg("photo-1497700003451-e1df943a194b"),
-  game:     uImg("photo-1629760946220-5693ee4c46ac"),
-  art:      uImg("photo-1554907984-15263bfd63bd"),
-  clothing: uImg("photo-1620799140408-edc6dcb6d633"),
-  skincare: uImg("photo-1556228578-8c89e6adf883"),
-  chocolate:uImg("photo-1623660053975-cf75a8be0908"),
-  gift:     uImg("photo-1549465220-1a8b9238cd48"),
-  honey:    uImg("photo-1587049352851-8d4e89133924"),
-  oil:      uImg("photo-1474979266404-7eaacbcd87c5"),
-  socks:    uImg("photo-1615486364462-ef6363adbc18"),
-  garden:   uImg("photo-1416879595882-3373a0480b5b"),
-  default:  uImg("photo-1514228742587-6b1558fcca3d"),
+  coffee:    uImg("photo-1495474472287-4d71bcdd2085"),
+  keyboard:  uImg("photo-1618384887929-16ec33fab9ef"),
+  vinyl:     uImg("photo-1602848597941-0d3d3a2c1241"),
+  beer:      uImg("photo-1608270586620-248524c67de9"),
+  plant:     uImg("photo-1485955900006-10f4d324d411"),
+  wallet:    uImg("photo-1627123424574-724758594e93"),
+  candle:    uImg("photo-1561212856-44e9bae482aa"),
+  mug:       uImg("photo-1514228742587-6b1558fcca3d"),
+  tote:      uImg("photo-1574365569389-a10d488ca3fb"),
+  jewelry:   uImg("photo-1515562141207-7a88fb7ce338"),
+  toys:      uImg("photo-1558060370-d644479cb6f7"),
+  books:     uImg("photo-1512820790803-83ca734da794"),
+  notebook:  uImg("photo-1456735190827-d1262f71b8a3"),
+  tea:       uImg("photo-1610478506025-8110cc8f1986"),
+  food:      uImg("photo-1497700003451-e1df943a194b"),
+  game:      uImg("photo-1511512578047-dfb367046420"),
+  art:       uImg("photo-1554907984-15263bfd63bd"),
+  clothing:  uImg("photo-1521572163474-6864f9cf17ab"),
+  skincare:  uImg("photo-1596462502278-27bfdc403348"),
+  chocolate: uImg("photo-1623660053975-cf75a8be0908"),
+  gift:      uImg("photo-1549465220-1a8b9238cd48"),
+  honey:     uImg("photo-1587049352851-8d4e89133924"),
+  oil:       uImg("photo-1474979266404-7eaacbcd87c5"),
+  socks:     uImg("photo-1615486364462-ef6363adbc18"),
+  garden:    uImg("photo-1416879595882-3373a0480b5b"),
+  automotive: uImg("photo-1486262715619-67b85e0b08d3"),
+  electronics: uImg("photo-1498049794561-7780e7231661"),
+  kitchen:    uImg("photo-1556909172-54557c7e4fb7"),
+  power:      uImg("photo-1509391366360-2e959784a276"),
+  appliance:  uImg("photo-1556909114-f6e7ad7d3136"),
+  outdoor:    uImg("photo-1504280390367-361c6d9f38f4"),
+  pet:        uImg("photo-1583337130417-3346a1be7dee"),
+  sports:     uImg("photo-1461896836934-ffe607ba8211"),
+  health:     uImg("photo-1550572017-edd951b55104"),
+  home:       uImg("photo-1556909114-f6e7ad7d3136"),
+  office:     uImg("photo-1456735190827-d1262f71b8a3"),
+  personal:   uImg("photo-1596462502278-27bfdc403348"),
+  wellness:   uImg("photo-1544367567-0f2fcb009e0b"),
+  baby:       uImg("photo-1522771930-78848d9293e8"),
+  reading:    uImg("photo-1512820790803-83ca734da794"),
+  default:    uImg("photo-1514228742587-6b1558fcca3d"),
 };
 
-/**
- * Fix internal image URLs that don't work in production.
- * If the URL contains "trae-api-cn", map it to a public Unsplash URL
- * based on the product name keywords.
- */
-export function fixImageUrl(name: string, url: string): string {
-  if (!url || !url.includes("trae-api-cn")) return url;
-  const s = (name + " " + decodeURIComponent(url)).toLowerCase();
-  if (s.includes("keyboard") || s.includes("tech")) return IMG.keyboard;
-  if (s.includes("coffee") || s.includes("pour-over") || s.includes("bean")) return IMG.coffee;
-  if (s.includes("vinyl") || s.includes("turntable") || s.includes("record") || s.includes("music")) return IMG.vinyl;
-  if (s.includes("beer") || s.includes("brew")) return IMG.beer;
-  if (s.includes("plant") || s.includes("garden") || s.includes("herb")) return IMG.plant;
-  if (s.includes("wallet") || s.includes("leather") || s.includes("cable")) return IMG.wallet;
-  if (s.includes("candle")) return IMG.candle;
-  if (s.includes("mug") || s.includes("tumbler") || s.includes("cup") || s.includes("camp")) return IMG.mug;
-  if (s.includes("tote") || s.includes("bag")) return IMG.tote;
-  if (s.includes("necklace") || s.includes("jewelry") || s.includes("bracelet") || s.includes("ring")) return IMG.jewelry;
-  if (s.includes("toy") || s.includes("block") || s.includes("kid") || s.includes("bike") || s.includes("marker") || s.includes("plush") || s.includes("microscope")) return IMG.toys;
-  if (s.includes("book") || s.includes("journal") || s.includes("notebook") || s.includes("cookbook")) return IMG.notebook;
-  if (s.includes("tea")) return IMG.tea;
-  if (s.includes("food") || s.includes("sauce") || s.includes("honey") || s.includes("oil") || s.includes("chocolate")) return IMG.food;
-  if (s.includes("game") || s.includes("board")) return IMG.game;
-  if (s.includes("art") || s.includes("print")) return IMG.art;
-  if (s.includes("scarf") || s.includes("robe") || s.includes("cardigan") || s.includes("slipper") || s.includes("sock") || s.includes("wear") || s.includes("blanket")) return IMG.clothing;
-  if (s.includes("cream") || s.includes("skincare") || s.includes("soap")) return IMG.skincare;
-  if (s.includes("frame") || s.includes("photo")) return IMG.default;
-  return IMG.default;
-}
+// fixImageUrl 已移至 lib/images.ts，通过 import 引入
 
 export type Recipient = {
   slug: string;

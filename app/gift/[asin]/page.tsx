@@ -8,11 +8,11 @@ import {
 } from "@/lib/supabase";
 import {
   AFFILIATE_TAG,
-  fixImageUrl,
   formatPrice,
   productToGift,
   type Gift,
 } from "@/lib/data";
+import { fixImageUrl } from "@/lib/images";
 import type { Metadata } from "next";
 
 // ---------- 静态生成 ----------
