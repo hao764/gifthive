@@ -29,7 +29,19 @@ export const IMG = {
 const _WB = (kw: string) => new RegExp(`\\b${kw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i");
 const has = (s: string, kw: string) => _WB(kw).test(s);
 
+// 中性占位图：匹配不到分类时不挂随机默认图，用灰色占位
+const PLACEHOLDER =
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect width="100%" height="100%" fill="#f0ebe3"/><circle cx="400" cy="270" r="50" fill="#d4cec3"/><rect x="320" y="340" width="160" height="10" rx="5" fill="#d4cec3"/></svg>'
+  );
+
 export function fixImageUrl(name: string, url: string): string {
+  // 优先透传真实商品图（亚马逊 CDN），不覆盖
+  if (url && /m\.media-amazon\.com/i.test(url)) return url;
+  // 透传其他有效的非 Unsplash 链接
+  if (url && /^https?:\/\//.test(url) && !/unsplash\.com/i.test(url)) return url;
+
   const s = (name + " " + (url ? decodeURIComponent(url) : "")).toLowerCase();
 
   // ---- 0. 办公 / 文具 / 书写工具 ----
@@ -324,6 +336,6 @@ export function fixImageUrl(name: string, url: string): string {
   )
     return IMG.wellness;
 
-  // ---- 兜底：永远返回默认图，不再透传错误的 URL ----
-  return IMG.default;
+  // ---- 兜底：匹配不到分类，不挂随机图，用中性占位 ----
+  return PLACEHOLDER;
 }
