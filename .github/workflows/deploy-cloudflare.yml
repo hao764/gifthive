@@ -8,6 +8,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
     steps:
       - uses: actions/checkout@v4
 
@@ -18,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
-      - name: Build + Adapt for Cloudflare Pages
+      - name: Build for Cloudflare Pages
         run: npx @cloudflare/next-on-pages
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
@@ -30,10 +33,9 @@ jobs:
           test -f ".vercel/output/static/_worker.js/index.js" || { echo "Missing _worker.js/index.js"; exit 1; }
           echo "Build output verified: $(ls .vercel/output/static/ | wc -l) files"
 
-      - name: Install wrangler and deploy
-        run: |
-          npm install -g wrangler
-          wrangler pages deploy .vercel/output/static --project-name=gifthive
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy .vercel/output/static --project-name=gifthive
