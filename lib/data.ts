@@ -83,17 +83,17 @@ export type Gift = {
 
 /**
  * 生成亚马逊联盟链接：
- * - 若 gift.amazonUrl 已指定 → 用它，并补上 tag 参数
+ * - 若 gift.amazonUrl 已指定 → 用它，并强制把 tag 替换成我们的真实联盟 ID
+ *   （数据库里的 affiliate_url 可能自带占位 tag，如 GIFTHIVE-20，必须覆盖）
  * - 否则 → fallback 到按商品名的搜索结果页 + tag
  */
 export function getAmazonUrl(gift: Gift): string {
   if (gift.amazonUrl) {
-    // 链接里已经带了 tag= 就别再加了（数据库里的 affiliate_url 通常自带）
-    if (/[?&]tag=/i.test(gift.amazonUrl)) {
-      return gift.amazonUrl;
-    }
-    const sep = gift.amazonUrl.includes("?") ? "&" : "?";
-    return `${gift.amazonUrl}${sep}tag=${AFFILIATE_TAG}`;
+    // 强制使用我们的真实联盟 tag：已带 tag 的替换，没带的补上
+    const withOurTag = /[?&]tag=/i.test(gift.amazonUrl)
+      ? gift.amazonUrl.replace(/([?&])tag=[^&]*/i, `$1tag=${AFFILIATE_TAG}`)
+      : `${gift.amazonUrl}${gift.amazonUrl.includes("?") ? "&" : "?"}tag=${AFFILIATE_TAG}`;
+    return withOurTag;
   }
   return `https://www.amazon.com/s?k=${encodeURIComponent(gift.name)}&tag=${AFFILIATE_TAG}`;
 }
