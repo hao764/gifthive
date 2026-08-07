@@ -34,6 +34,18 @@ type ProviderSpec = {
   extraHeaders?: Record<string, string>;
 };
 
+/**
+ * 默认站点 URL。用户绑自定义域名后，把 NEXT_PUBLIC_SITE_URL 加到
+ * Pages secrets/GitHub secrets 里覆盖即可；没配置就用 pages.dev 默认
+ * 域名，保证 OpenRouter HTTP-Referer、canonical、sitemap 等不会空。
+ */
+const DEFAULT_SITE_URL = "https://gifthive.pages.dev";
+
+/** SEO / metadata 里要用到的 siteURL，统一走这里（兜底 pages.dev） */
+export function getSiteURL(): string {
+  return process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_URL;
+}
+
 const PROVIDER_SPECS: ProviderSpec[] = [
   {
     name: "DEEPSEEK",
@@ -47,7 +59,8 @@ const PROVIDER_SPECS: ProviderSpec[] = [
     baseURL: "https://openrouter.ai/api/v1/chat/completions",
     defaultModel: process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini",
     extraHeaders: {
-      "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL || "https://gifthive.pages.dev",
+      "HTTP-Referer":
+        process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_URL,
       "X-Title": "GiftHive — Gift Finder",
     },
   },
