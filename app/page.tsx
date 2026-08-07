@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import GiftCard from "@/components/GiftCard";
 import HeroShowcase from "@/components/HeroShowcase";
 import Reveal from "@/components/Reveal";
@@ -16,15 +17,31 @@ function formatGiftsFound(n: number): string {
 }
 
 export default async function HomePage() {
+  const t = await getTranslations("Home");
   const [editorsPicks, totalCount] = await Promise.all([
     getEditorsPicksFallback(4),
     getTotalGiftsCountFallback(),
   ]);
+
+  const marqueeItems = [
+    t("marquee.line1"),
+    t("marquee.line2"),
+    t("marquee.line3"),
+    t("marquee.line4"),
+    t("marquee.line5"),
+  ];
+
+  const finderSteps = [
+    { n: "01", t: t("finder.steps.s1_title"), d: t("finder.steps.s1_desc") },
+    { n: "02", t: t("finder.steps.s2_title"), d: t("finder.steps.s2_desc") },
+    { n: "03", t: t("finder.steps.s3_title"), d: t("finder.steps.s3_desc") },
+    { n: "04", t: t("finder.steps.s4_title"), d: t("finder.steps.s4_desc") },
+    { n: "05", t: t("finder.steps.s5_title"), d: t("finder.steps.s5_desc") },
+    { n: "06", t: t("finder.steps.s6_title"), d: t("finder.steps.s6_desc") },
+  ];
+
   return (
     <>
-      {/* ============================================================ */}
-      {/* HERO                                                         */}
-      {/* ============================================================ */}
       <section className="relative overflow-hidden">
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute -left-32 top-8 h-80 w-80 rounded-full bg-ember/15 blur-3xl" />
@@ -34,27 +51,27 @@ export default async function HomePage() {
         </div>
 
         <div className="mx-auto max-w-7xl px-5 pb-16 pt-10 md:px-8 md:pb-28 md:pt-16">
-          {/* Editorial top row — 去掉假刊号，换成真实品牌线 */}
           <Reveal className="mb-10 flex items-center justify-between text-[0.66rem] uppercase tracking-widest text-ink/40">
-            <span className="font-display italic">GiftHive · The Gift Studio</span>
-            <span className="hidden font-display italic sm:block">EST. 2026</span>
+            <span className="font-display italic">{t("brandLine")}</span>
+            <span className="hidden font-display italic sm:block">
+              {t("estLine")}
+            </span>
           </Reveal>
 
           <div className="grid items-end gap-10 md:grid-cols-12 md:gap-8">
-            {/* Left: headline + glass panel */}
             <div className="md:col-span-7">
               <Reveal>
-                <span className="eyebrow">No. 01 · Pick the right gift, skip the guessing</span>
+                <span className="eyebrow">{t("hero.eyebrow")}</span>
               </Reveal>
 
               <Reveal delay={80}>
                 <h1 className="mt-6 font-display font-semibold leading-[0.98] tracking-tightest text-ink text-[3.25rem] sm:text-6xl md:text-[5.5rem]">
-                  Finding a gift
+                  {t("hero.title1")}
                   <br />
-                  doesn't have to be
+                  {t("hero.title2")}
                   <span className="relative inline-block px-1">
                     <span className="relative z-10 accent-italic text-ember-deep">
-                      this hard
+                      {t("hero.title3")}
                     </span>
                     <span className="absolute -bottom-1 left-0 z-0 h-3 w-full origin-left -skew-x-6 animate-draw-line bg-ember/25" />
                   </span>
@@ -64,20 +81,14 @@ export default async function HomePage() {
 
               <Reveal delay={160}>
                 <p className="mt-7 max-w-xl text-pretty text-lg leading-relaxed text-ink/65">
-                  Answer{" "}
-                  <span className="accent-italic text-ink">six questions</span>,
-                  get five gifts picked by{" "}
-                  <span className="underline-mark">
-                    AI that reads the whole catalog
-                  </span>{" "}
-                  — five, not 200.
+                  {t("hero.description")}
                 </p>
               </Reveal>
 
               <Reveal delay={240}>
                 <div className="mt-9 flex flex-wrap items-center gap-4">
                   <Link href="/quiz" className="group btn-primary">
-                    <span>Start the 6-step finder</span>
+                    <span>{t("hero.ctaPrimary")}</span>
                     <span className="transition-transform duration-500 ease-editorial group-hover:translate-x-0.5">
                       →
                     </span>
@@ -86,7 +97,7 @@ export default async function HomePage() {
                     href="/for-him"
                     className="group inline-flex items-center gap-2 text-sm font-medium text-ink/70 transition-colors hover:text-ink"
                   >
-                    Or browse by recipient
+                    {t("hero.ctaSecondary")}
                     <span className="transition-transform duration-500 ease-editorial group-hover:translate-x-1">
                       →
                     </span>
@@ -94,13 +105,15 @@ export default async function HomePage() {
                 </div>
               </Reveal>
 
-              {/* Stats — Apple glass card（数字全部真实，非编造） */}
               <Reveal delay={320}>
                 <div className="glass mt-12 grid max-w-md grid-cols-3 gap-6 rounded-2xl p-6">
                   {[
-                    { num: "6", label: "questions" },
-                    { num: "5", label: "AI picks" },
-                    { num: formatGiftsFound(totalCount), label: "in the catalog" },
+                    { num: "6", label: t("hero.stats.questions") },
+                    { num: "5", label: t("hero.stats.picks") },
+                    {
+                      num: formatGiftsFound(totalCount),
+                      label: t("hero.stats.catalog"),
+                    },
                   ].map((s) => (
                     <div key={s.label}>
                       <p className="font-display text-3xl font-semibold tracking-tight text-ink">
@@ -113,7 +126,6 @@ export default async function HomePage() {
               </Reveal>
             </div>
 
-            {/* Right: hero image + floating cards */}
             <div className="md:col-span-5">
               <Reveal delay={200}>
                 <HeroShowcase />
@@ -122,43 +134,32 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* Marquee */}
         <div className="border-y border-ink/8 bg-cream-warm/40 py-4">
-          <Marquee
-            items={[
-              "GIFTHIVE · The Gift Studio",
-              "Pick the right gift, skip the guessing",
-              "Six steps, five picks, truly chosen",
-              "EST. 2026",
-              "A gift they'll actually use",
-            ]}
-          />
+          <Marquee items={marqueeItems} />
         </div>
       </section>
 
-      {/* ============================================================ */}
-      {/* No.02 · Browse by recipient                                  */}
-      {/* ============================================================ */}
       <section className="bg-cream-warm/40 py-20 md:py-28">
         <div className="mx-auto max-w-7xl px-5 md:px-8">
           <Reveal className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
             <div>
-              <span className="section-index">No. 02</span>
-              <span className="eyebrow ml-4">Browse by recipient</span>
+              <span className="section-index">{t("browse.sectionIndex")}</span>
+              <span className="eyebrow ml-4">{t("browse.eyebrow")}</span>
               <h2 className="mt-5 max-w-2xl font-display text-4xl font-semibold tracking-tighter text-ink md:text-5xl">
-                Know the person first,{" "}
-                <span className="accent-italic text-ember-deep">the gift second</span>.
+                {t("browse.title1")}{" "}
+                <span className="accent-italic text-ember-deep">
+                  {t("browse.title2")}
+                </span>
               </h2>
               <p className="mt-4 max-w-xl text-pretty leading-relaxed text-ink/60">
-                Everyone plays a different role in your life. Starting from who
-                they are beats starting from what's trending.
+                {t("browse.description")}
               </p>
             </div>
             <Link
               href="/for-him"
               className="group inline-flex items-center gap-2 text-sm font-medium text-ink/60 transition-colors hover:text-ink"
             >
-              See all recipients
+              {t("browse.seeAll")}
               <span className="transition-transform duration-500 ease-editorial group-hover:translate-x-1">
                 →
               </span>
@@ -170,7 +171,11 @@ export default async function HomePage() {
               <Reveal
                 key={r.slug}
                 delay={i * 70}
-                className={i === 0 ? "col-span-2 md:col-span-2 md:row-span-2" : ""}
+                className={
+                  i === 0
+                    ? "col-span-2 md:col-span-2 md:row-span-2"
+                    : ""
+                }
               >
                 <Link
                   href={`/${r.slug}`}
@@ -217,7 +222,7 @@ export default async function HomePage() {
                       </p>
                     )}
                     <span className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-cream/90 transition-all duration-500 ease-editorial group-hover:gap-3">
-                      Browse
+                      {t("browse.browse")}
                       <span>→</span>
                     </span>
                   </div>
@@ -228,9 +233,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ============================================================ */}
-      {/* No.03 · Embedded finder                                      */}
-      {/* ============================================================ */}
       <section className="relative py-20 md:py-28">
         <div className="mx-auto max-w-7xl px-5 md:px-8">
           <Reveal>
@@ -245,27 +247,24 @@ export default async function HomePage() {
                 <div>
                   <div className="flex items-center gap-3">
                     <span className="font-display text-sm italic text-cream/40">
-                      No. 03
+                      {t("finder.sectionIndex")}
                     </span>
                     <span className="h-px w-8 bg-cream/20" />
                     <span className="text-[0.62rem] font-semibold uppercase tracking-widest text-ember-soft">
-                      Embedded finder
+                      {t("finder.eyebrow")}
                     </span>
                   </div>
 
                   <h2 className="mt-5 font-display text-4xl font-semibold leading-[1.05] tracking-tighter md:text-[3.25rem]">
-                    Skip the endless scroll.
+                    {t("finder.title1")}
                     <br />
-                    <span className="accent-italic text-ember">AI reads</span>,
-                    you pick.
+                    <span className="accent-italic text-ember">
+                      {t("finder.title2")}
+                    </span>
+                    {t("finder.title3")}
                   </h2>
                   <p className="mt-5 max-w-md text-pretty leading-relaxed text-cream/65">
-                    We split "what should I get?" into six small questions —
-                    who, occasion, budget, interests, personality, your
-                    relationship.{" "}
-                    <span className="accent-italic text-cream/85">
-                      No personal stuff, just sharper than you'd expect.
-                    </span>
+                    {t("finder.description")}
                   </p>
 
                   <div className="mt-8 flex flex-wrap items-center gap-4">
@@ -273,28 +272,20 @@ export default async function HomePage() {
                       href="/quiz"
                       className="group inline-flex items-center gap-2 overflow-hidden rounded-full bg-ember px-7 py-3.5 text-sm font-medium text-ink transition-all duration-500 ease-editorial hover:bg-ember-soft hover:shadow-glow"
                     >
-                      <span>Start now</span>
+                      <span>{t("finder.ctaStart")}</span>
                       <span className="transition-transform duration-500 ease-editorial group-hover:translate-x-0.5">
                         →
                       </span>
                     </Link>
                     <span className="text-xs text-cream/50">
-                      About 2 minutes · No sign-up
+                      {t("finder.aboutTime")}
                     </span>
                   </div>
                 </div>
 
-                {/* Steps preview */}
                 <div className="relative">
                   <div className="grid gap-3">
-                    {[
-                      { n: "01", t: "Who it's for", d: "Partner · Parent · Sibling · Friend" },
-                      { n: "02", t: "The occasion", d: "Birthday · Anniversary · Holiday · Thanks" },
-                      { n: "03", t: "The budget", d: "A range, or let us decide" },
-                      { n: "04", t: "Interests", d: "Tech · Coffee · Outdoors · Reading" },
-                      { n: "05", t: "Personality", d: "Practical / Romantic / Minimalist" },
-                      { n: "06", t: "Relationship", d: "Partner · Family · Close friend · Coworker" },
-                    ].map((s) => (
+                    {finderSteps.map((s) => (
                       <div
                         key={s.n}
                         className="group glass-dark flex items-center gap-4 rounded-2xl p-4 transition-all duration-500 ease-editorial hover:border-ember/40"
@@ -303,7 +294,9 @@ export default async function HomePage() {
                           {s.n}
                         </span>
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-cream">{s.t}</p>
+                          <p className="text-sm font-medium text-cream">
+                            {s.t}
+                          </p>
                           <p className="text-xs text-cream/50">{s.d}</p>
                         </div>
                         <span className="h-1.5 w-1.5 rounded-full bg-cream/30 transition-colors group-hover:bg-ember" />
@@ -317,29 +310,27 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ============================================================ */}
-      {/* No.04 · Editor's picks                                       */}
-      {/* ============================================================ */}
       <section className="border-t border-ink/8 py-20 md:py-28">
         <div className="mx-auto max-w-7xl px-5 md:px-8">
           <Reveal className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
             <div>
-              <span className="section-index">No. 04</span>
-              <span className="eyebrow ml-4">Editor's picks</span>
+              <span className="section-index">{t("editors.sectionIndex")}</span>
+              <span className="eyebrow ml-4">{t("editors.eyebrow")}</span>
               <h2 className="mt-5 font-display text-4xl font-semibold tracking-tighter text-ink md:text-5xl">
-                This week, we picked{" "}
-                <span className="accent-italic text-ember-deep">these</span>.
+                {t("editors.title1")}{" "}
+                <span className="accent-italic text-ember-deep">
+                  {t("editors.title2")}
+                </span>
               </h2>
               <p className="mt-4 max-w-xl text-pretty leading-relaxed text-ink/60">
-                Not a best-seller list — what our editors wanted to buy, or just
-                bought. With the reason why.
+                {t("editors.description")}
               </p>
             </div>
             <Link
               href="/for-him"
               className="group inline-flex items-center gap-2 text-sm font-medium text-ink/60 transition-colors hover:text-ink"
             >
-              See all picks
+              {t("editors.seeAll")}
               <span className="transition-transform duration-500 ease-editorial group-hover:translate-x-1">
                 →
               </span>
@@ -349,32 +340,35 @@ export default async function HomePage() {
           <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {editorsPicks.map((gift, i) => (
               <Reveal key={gift.id} delay={i * 80}>
-                <GiftCard gift={gift} index={i + 1} ctaLabel="Shop" />
+                <GiftCard
+                  gift={gift}
+                  index={i + 1}
+                  ctaLabel={t("editors.seeAll")}
+                />
               </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ============================================================ */}
-      {/* No.05 · Journal                                              */}
-      {/* ============================================================ */}
       <section className="border-t border-ink/8 bg-cream-warm/40 py-20 md:py-28">
         <div className="mx-auto max-w-7xl px-5 md:px-8">
           <Reveal className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
             <div>
-              <span className="section-index">No. 05</span>
-              <span className="eyebrow ml-4">Journal</span>
+              <span className="section-index">{t("journal.sectionIndex")}</span>
+              <span className="eyebrow ml-4">{t("journal.eyebrow")}</span>
               <h2 className="mt-5 font-display text-4xl font-semibold tracking-tighter text-ink md:text-5xl">
-                Before you pick,{" "}
-                <span className="accent-italic text-ember-deep">read two lines</span>.
+                {t("journal.title1")}{" "}
+                <span className="accent-italic text-ember-deep">
+                  {t("journal.title2")}
+                </span>
               </h2>
             </div>
             <Link
               href="/journal"
               className="group inline-flex items-center gap-2 text-sm font-medium text-ink/60 transition-colors hover:text-ink"
             >
-              All articles
+              {t("journal.seeAll")}
               <span className="transition-transform duration-500 ease-editorial group-hover:translate-x-1">
                 →
               </span>
@@ -413,7 +407,7 @@ export default async function HomePage() {
                       {article.excerpt}
                     </p>
                     <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-ink transition-all duration-500 ease-editorial group-hover:gap-3">
-                      Keep reading
+                      {t("journal.keepReading")}
                       <span>→</span>
                     </span>
                   </div>
@@ -424,9 +418,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ============================================================ */}
-      {/* No.06 · Closing CTA                                          */}
-      {/* ============================================================ */}
       <section className="relative overflow-hidden py-24 md:py-36">
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute left-1/2 top-1/2 h-[30rem] w-[30rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-ember/8 blur-3xl" />
@@ -434,23 +425,25 @@ export default async function HomePage() {
 
         <div className="mx-auto max-w-3xl px-5 text-center md:px-8">
           <Reveal>
-            <span className="eyebrow eyebrow-center">No. 06 · Still unsure?</span>
+            <span className="eyebrow eyebrow-center">{t("closing.eyebrow")}</span>
           </Reveal>
           <Reveal delay={80}>
             <h2 className="mt-6 font-display text-4xl font-semibold leading-[1.05] tracking-tighter text-ink md:text-6xl">
-              Hand the headache to a{" "}
-              <span className="accent-italic text-ember-deep">six-step quiz</span>.
+              {t("closing.title1")}{" "}
+              <span className="accent-italic text-ember-deep">
+                {t("closing.title2")}
+              </span>
             </h2>
           </Reveal>
           <Reveal delay={160}>
             <p className="mx-auto mt-6 max-w-xl text-pretty text-lg leading-relaxed text-ink/60">
-              No sign-up, no email. Two minutes, five picks chosen with care.
+              {t("closing.description")}
             </p>
           </Reveal>
           <Reveal delay={240}>
             <div className="mt-9 flex justify-center">
               <Link href="/quiz" className="group btn-primary">
-                <span>Start the finder</span>
+                <span>{t("closing.cta")}</span>
                 <span className="transition-transform duration-500 ease-editorial group-hover:translate-x-0.5">
                   →
                 </span>

@@ -2,11 +2,52 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import QuizStep from "@/components/QuizStep";
 import { quizQuestions } from "@/lib/data";
 
+// Map quiz option values to translation keys
+const OPTION_LABEL_KEYS: Record<string, Record<string, string>> = {
+  recipient: {
+    him: "him", her: "her", kids: "kids", parents: "parents",
+    friends: "friends", other: "other",
+  },
+  occasion: {
+    birthday: "birthday", anniversary: "anniversary", holiday: "holiday",
+    thanks: "thanks", apology: "apology", "no-reason": "noReason",
+  },
+  budget: {
+    "0-30": "under30", "30-75": "range30to75", "75-150": "range75to150",
+    "150-400": "range150to400", "400+": "over400", flexible: "flexible",
+  },
+  interests: {
+    tech: "tech", coffee: "coffee", outdoor: "outdoor",
+    reading: "reading", cooking: "cooking", music: "music",
+  },
+  personality: {
+    practical: "practical", romantic: "romantic",
+    minimal: "minimal", playful: "playful",
+  },
+  closeness: {
+    partner: "partner", family: "family", "close-friend": "closeFriend",
+    colleague: "colleague", acquaintance: "acquaintance", client: "client",
+  },
+};
+
+const OPTION_DESC_KEYS: Record<string, Record<string, string>> = {
+  recipient: {
+    him: "himDesc", her: "herDesc", kids: "kidsDesc",
+    parents: "parentsDesc", friends: "friendsDesc", other: "otherDesc",
+  },
+  personality: {
+    practical: "practicalDesc", romantic: "romanticDesc",
+    minimal: "minimalDesc", playful: "playfulDesc",
+  },
+};
+
 export default function QuizPage() {
   const router = useRouter();
+  const t = useTranslations("Quiz");
   const total = quizQuestions.length;
   const [current, setCurrent] = useState(1); // starts at 1
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -14,6 +55,25 @@ export default function QuizPage() {
 
   const question = quizQuestions[current - 1];
   const selected = answers[question.key];
+
+  // Build translated question
+  const qKey = question.key as keyof typeof OPTION_LABEL_KEYS;
+  const labelMap = OPTION_LABEL_KEYS[qKey];
+  const descMap = OPTION_DESC_KEYS[qKey];
+  const translatedQuestion = {
+    ...question,
+    title: t(`questions.${qKey}.title`),
+    subtitle: t(`questions.${qKey}.subtitle`),
+    options: question.options.map((opt) => {
+      const labelKey = labelMap?.[opt.value];
+      const descKey = descMap?.[opt.value];
+      return {
+        ...opt,
+        label: labelKey ? t(`questions.${qKey}.${labelKey}`) : opt.label,
+        description: descKey ? t(`questions.${qKey}.${descKey}`) : opt.description,
+      };
+    }),
+  };
 
   const handleSelect = (value: string) => {
     setAnswers((prev) => ({ ...prev, [question.key]: value }));
@@ -50,24 +110,23 @@ export default function QuizPage() {
         <div className="mx-auto mb-14 max-w-3xl text-center md:mb-20">
           <div className="flex items-center justify-center gap-3">
             <span className="font-display text-sm italic text-ink/40">
-              Gift Finder
+              {t("eyebrow")}
             </span>
             <span className="h-px w-8 bg-ink/20" />
             <span className="text-[0.62rem] font-semibold uppercase tracking-widest text-ember-deep">
-              6 questions
+              {t("badge")}
             </span>
           </div>
           <h1 className="mt-5 font-display text-4xl font-semibold leading-[1.05] tracking-tighter text-ink md:text-6xl">
-            Six steps to the gift
+            {t("title1")}
             <br />
             <span className="accent-italic text-ember-deep">
-              they'll actually use
+              {t("title2")}
             </span>
             .
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-pretty leading-relaxed text-ink/60">
-            There are no right answers. The more honest you are, the closer it
-            lands.
+            {t("subtitle")}
           </p>
         </div>
 
@@ -82,22 +141,27 @@ export default function QuizPage() {
             </div>
             <div>
               <p className="font-display text-lg font-medium tracking-tight text-ink">
-                Picking five gifts for you…
+                {t("loadingTitle")}
               </p>
               <p className="mt-1 text-sm text-ink/50">
-                Matching 200+ picks by interest, budget, and relationship.
+                {t("loadingSubtitle")}
               </p>
             </div>
           </div>
         ) : (
           <QuizStep
-            question={question}
+            question={translatedQuestion}
             total={total}
             current={current}
             selected={selected}
             onSelect={handleSelect}
             onNext={handleNext}
             onBack={handleBack}
+            labels={{
+              back: t("back"),
+              next: t("next"),
+              seeResults: t("seeResults"),
+            }}
           />
         )}
 
@@ -106,13 +170,19 @@ export default function QuizPage() {
           <div className="mx-auto mt-16 max-w-3xl">
             <p className="mb-3 flex items-center gap-2 text-[0.62rem] font-semibold uppercase tracking-widest text-ink/40">
               <span className="h-px w-6 bg-ink/20" />
-              Answered so far
+              {t("answeredSoFar")}
             </p>
             <div className="flex flex-wrap gap-2">
               {quizQuestions
                 .filter((q) => answers[q.key])
                 .map((q) => {
                   const opt = q.options.find((o) => o.value === answers[q.key]);
+                  const qk = q.key as keyof typeof OPTION_LABEL_KEYS;
+                  const lm = OPTION_LABEL_KEYS[qk];
+                  const labelKey = lm?.[answers[q.key]];
+                  const translatedLabel = labelKey
+                    ? t(`questions.${qk}.${labelKey}`)
+                    : opt?.label || "";
                   return (
                     <span
                       key={q.key}
@@ -121,7 +191,7 @@ export default function QuizPage() {
                       <span className="font-display italic text-ink/35">
                         {String(q.id).padStart(2, "0")}
                       </span>
-                      {opt?.label}
+                      {translatedLabel}
                     </span>
                   );
                 })}

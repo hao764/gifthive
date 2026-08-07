@@ -2,52 +2,48 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import GiftCard from "@/components/GiftCard";
 import Reveal from "@/components/Reveal";
 import Marquee from "@/components/Marquee";
 import type { Gift } from "@/lib/data";
 
+// Map slug to translation section key
+const SLUG_TO_SECTION: Record<string, string> = {
+  "for-him": "forHim",
+  "for-her": "forHer",
+  "for-kids": "forKids",
+  "for-parents": "forParents",
+  "for-friends": "forFriends",
+  "for-coworkers": "forCoworkers",
+};
+
 type Props = {
-  /** Recipient display name, e.g. "For Her" */
-  heading: string;
-  /** Short eyebrow, e.g. "For Her" */
-  label: string;
-  /** Slug used for breadcrumb / index, e.g. "for-her" */
   slug: string;
-  /** Ordinal out of 6, e.g. 2 -> "02 / 06" */
   index: number;
-  /** Lede paragraph (supports JSX for italic accents) */
-  lede: React.ReactNode;
-  /** Marquee items */
-  marquee: string[];
-  /** "ranked by" tail, e.g. "what she'd love" */
-  rankedBy: string;
-  /** Gift list */
   gifts: Gift[];
-  /** Computed filter list — usually ["All", ...unique categories] */
   filters: string[];
-  /** Starting price, e.g. "$24" */
   fromPrice: string;
 };
 
 export default function RecipientCategoryPage({
-  heading,
-  label,
   slug,
   index,
-  lede,
-  marquee,
-  rankedBy,
   gifts,
   filters,
   fromPrice,
 }: Props) {
+  const t = useTranslations("Category");
+  const section = SLUG_TO_SECTION[slug] || "forHim";
   const [active, setActive] = useState("All");
 
   const visible =
     active === "All"
       ? gifts
       : gifts.filter((g) => g.category === active);
+
+  // "All" filter is always first; rest are category names (from DB)
+  const allFilter = filters[0];
 
   return (
     <section className="relative overflow-hidden">
@@ -62,17 +58,17 @@ export default function RecipientCategoryPage({
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-xs text-ink/45">
             <Link href="/" className="transition-colors hover:text-ink">
-              Home
+              {t("home")}
             </Link>
             <span className="text-ink/25">/</span>
-            <span className="text-ink/70">{label}</span>
+            <span className="text-ink/70">{t(`${section}.heading`)}</span>
           </nav>
 
           <div className="mt-6 grid items-end gap-8 md:grid-cols-12">
             <div className="md:col-span-8">
               <div className="flex items-center gap-3">
                 <span className="font-display text-sm italic text-ink/40">
-                  Category
+                  {t("categoryLabel")}
                 </span>
                 <span className="h-px w-8 bg-ink/20" />
                 <span className="text-[0.62rem] font-semibold uppercase tracking-widest text-ember-deep">
@@ -81,10 +77,14 @@ export default function RecipientCategoryPage({
               </div>
 
               <h1 className="mt-5 font-display text-6xl font-semibold leading-[0.95] tracking-tightest text-ink md:text-[8rem]">
-                {heading}
+                {t(`${section}.heading`)}
               </h1>
               <p className="mt-6 max-w-xl text-pretty text-lg leading-relaxed text-ink/65">
-                {lede}
+                {t(`${section}.lede1`)}{" "}
+                <span className="accent-italic text-ember-deep">
+                  {t(`${section}.lede2`)}
+                </span>
+                {t(`${section}.lede3`)}
               </p>
             </div>
 
@@ -92,9 +92,9 @@ export default function RecipientCategoryPage({
             <div className="md:col-span-4">
               <div className="grid grid-cols-3 gap-4 rounded-3xl border border-ink/8 bg-cream-warm/40 p-6">
                 {[
-                  { n: `${gifts.length}`, l: "picks" },
-                  { n: `${filters.length - 1}`, l: "tags" },
-                  { n: fromPrice, l: "from" },
+                  { n: `${gifts.length}`, l: t("picks") },
+                  { n: `${filters.length - 1}`, l: t("tags") },
+                  { n: fromPrice, l: t("from") },
                 ].map((s) => (
                   <div key={s.l}>
                     <p className="font-display text-3xl font-semibold tracking-tight text-ink">
@@ -110,7 +110,14 @@ export default function RecipientCategoryPage({
 
         {/* Marquee */}
         <div className="border-t border-ink/8 bg-cream-warm/30 py-4">
-          <Marquee items={marquee} />
+          <Marquee
+            items={[
+              t(`${section}.marquee1`),
+              t(`${section}.marquee2`),
+              t(`${section}.marquee3`),
+              t(`${section}.marquee4`),
+            ]}
+          />
         </div>
       </div>
 
@@ -131,13 +138,13 @@ export default function RecipientCategoryPage({
                     : "border-ink/15 text-ink/65 hover:border-ink/40 hover:text-ink"
                 }`}
               >
-                {f}
+                {f === "All" ? t("all") : f}
               </button>
             );
           })}
           <span className="ml-auto hidden flex-none items-center gap-2 text-xs text-ink/40 md:flex">
-            <span className="font-display italic">Ranked by</span>
-            <span>{rankedBy}</span>
+            <span className="font-display italic">{t("rankedBy")}</span>
+            <span>{t(`${section}.rankedBy`)}</span>
           </span>
         </div>
       </div>
@@ -148,17 +155,17 @@ export default function RecipientCategoryPage({
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {visible.map((gift, i) => (
               <Reveal key={gift.id} delay={(i % 3) * 80}>
-                <GiftCard gift={gift} index={i + 1} ctaLabel="Shop" />
+                <GiftCard gift={gift} index={i + 1} ctaLabel={t("shop")} />
               </Reveal>
             ))}
           </div>
         ) : (
           <div className="py-20 text-center">
             <p className="font-display text-2xl italic text-ink/50">
-              No picks in this category yet.
+              {t("noPicks")}
             </p>
             <p className="mt-2 text-sm text-ink/45">
-              Try another tag, or let the finder choose.
+              {t("noPicksDesc")}
             </p>
           </div>
         )}
@@ -169,20 +176,20 @@ export default function RecipientCategoryPage({
             <span className="font-display text-xs italic text-ink/35">✦</span>
           </div>
           <p className="text-sm text-ink/55">
-            Still nothing?{" "}
+            {t("stillNothing")}{" "}
             <span className="accent-italic text-ink">
-              Then let the finder do it.
+              {t("letFinder")}
             </span>
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Link href="/quiz" className="group btn-primary">
-              <span>Try the finder</span>
+              <span>{t("tryFinder")}</span>
               <span className="transition-transform duration-500 ease-editorial group-hover:translate-x-0.5">
                 →
               </span>
             </Link>
             <Link href="/" className="btn-ghost">
-              Back home
+              {t("backHome")}
             </Link>
           </div>
         </div>

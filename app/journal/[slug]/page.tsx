@@ -3,8 +3,9 @@ import { notFound } from "next/navigation";
 import GiftCard from "@/components/GiftCard";
 import Reveal from "@/components/Reveal";
 import { articles } from "@/lib/data";
+import { getTranslations } from "next-intl/server";
+import type { Metadata } from "next";
 
-// Cloudflare Pages 需要 Edge Runtime
 export const runtime = "edge";
 
 type Props = { params: { slug: string } };
@@ -13,16 +14,18 @@ export function generateStaticParams() {
   return articles.map((a) => ({ slug: a.slug }));
 }
 
-export function generateMetadata({ params }: Props) {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const t = await getTranslations("Journal");
   const article = articles.find((a) => a.slug === params.slug);
-  if (!article) return { title: "Not found — GiftHive" };
+  if (!article) return { title: t("notFound") };
   return {
-    title: `${article.title} — GiftHive Journal`,
+    title: `${article.title} ${t("articleMetaTitle")}`,
     description: article.excerpt,
   };
 }
 
-export default function ArticlePage({ params }: Props) {
+export default async function ArticlePage({ params }: Props) {
+  const t = await getTranslations("Journal");
   const article = articles.find((a) => a.slug === params.slug);
   if (!article) notFound();
 
@@ -46,7 +49,7 @@ export default function ArticlePage({ params }: Props) {
               <span className="transition-transform duration-500 ease-editorial group-hover:-translate-x-1">
                 ←
               </span>
-              The Journal
+              {t("backToJournal")}
             </Link>
           </Reveal>
 
@@ -119,10 +122,8 @@ export default function ArticlePage({ params }: Props) {
           {/* Disclosure */}
           <Reveal>
             <div className="mt-14 rounded-[1rem] border border-ink/8 bg-cream-warm/40 p-5 text-xs leading-relaxed text-ink/55">
-              <span className="font-semibold text-ink/70">Disclosure.</span>{" "}
-              Some links on GiftHive are affiliate links. If you buy through
-              them, we may earn a small commission — at no extra cost to you.
-              It&apos;s what keeps the Journal running.
+              <span className="font-semibold text-ink/70">{t("disclosureTitle")}</span>{" "}
+              {t("disclosure")}
             </div>
           </Reveal>
         </div>
@@ -133,21 +134,20 @@ export default function ArticlePage({ params }: Props) {
         <section className="border-t border-ink/8 bg-cream-warm/40 py-20 md:py-28">
           <div className="mx-auto max-w-7xl px-5 md:px-8">
             <Reveal className="mb-10 flex flex-col items-start gap-3">
-              <span className="section-index">No. 06</span>
-              <span className="eyebrow ml-4">From this article</span>
+              <span className="section-index">{t("relatedSectionIndex")}</span>
+              <span className="eyebrow ml-4">{t("relatedEyebrow")}</span>
               <h2 className="mt-5 font-display text-3xl font-semibold tracking-tighter text-ink md:text-4xl">
-                Three things we&apos;d actually give
+                {t("relatedTitle")}
               </h2>
               <p className="mt-2 text-pretty text-ink/60">
-                Each one opens on Amazon — we earn a small commission if you
-                decide to buy.
+                {t("relatedDesc")}
               </p>
             </Reveal>
 
             <div className="grid gap-6 md:grid-cols-3">
               {article.relatedGifts.map((gift, i) => (
                 <Reveal key={gift.id} delay={i * 90}>
-                  <GiftCard gift={gift} index={i + 1} ctaLabel="Shop on Amazon" />
+                  <GiftCard gift={gift} index={i + 1} ctaLabel={t("keepReading")} />
                 </Reveal>
               ))}
             </div>
@@ -161,17 +161,17 @@ export default function ArticlePage({ params }: Props) {
           <div className="mx-auto max-w-7xl px-5 md:px-8">
             <Reveal className="mb-10 flex items-end justify-between gap-6">
               <div>
-                <span className="section-index">No. 07</span>
-                <span className="eyebrow ml-4">Keep reading</span>
+                <span className="section-index">{t("moreSectionIndex")}</span>
+                <span className="eyebrow ml-4">{t("moreEyebrow")}</span>
                 <h2 className="mt-5 font-display text-3xl font-semibold tracking-tighter text-ink md:text-4xl">
-                  More from the Journal
+                  {t("moreTitle")}
                 </h2>
               </div>
               <Link
                 href="/journal"
                 className="group hidden items-center gap-2 text-sm font-medium text-ink/60 transition-colors hover:text-ink md:inline-flex"
               >
-                All articles
+                {t("allArticles")}
                 <span className="transition-transform duration-500 ease-editorial group-hover:translate-x-1">
                   →
                 </span>
@@ -206,7 +206,7 @@ export default function ArticlePage({ params }: Props) {
                         {a.excerpt}
                       </p>
                       <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-ink transition-all duration-500 ease-editorial group-hover:gap-3">
-                        Keep reading
+                        {t("keepReading")}
                         <span>→</span>
                       </span>
                     </div>

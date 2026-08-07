@@ -13,28 +13,23 @@ import {
   type Gift,
 } from "@/lib/data";
 import { fixImageUrl } from "@/lib/images";
+import { getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
 
 // ---------- 静态生成 ----------
-// 构建时尽量预渲染所有 ASIN（给 SEO + CDN），但如果构建时没拿到数据库 ASIN（例如构建环境变量缺失），
-// 则允许 dynamicParams=true，让访问时再按需动态渲染（SSR），避免直接 404 "没找到有效网页"
 export const dynamicParams = true;
 export const revalidate = 86400;
-// Cloudflare Pages 需要 Edge Runtime
 export const runtime = "edge";
 
-// Amazon ASIN 格式：10 位大写字母或数字
 const ASIN_RE = /^[A-Z0-9]{10}$/;
 
 export async function generateStaticParams() {
-  // 通过 REST API 直接拿所有 ASIN，避免在 build 时依赖 Supabase JS 客户端的运行时
   try {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     if (!url || !key) return [];
     const res = await fetch(`${url}/rest/v1/products?select=asin&asin=not.is.null&limit=1000`, {
       headers: { apikey: key, Authorization: `Bearer ${key}` },
-      // 构建期间允许用新数据
       next: { revalidate: 60 },
     });
     if (!res.ok) return [];
@@ -52,11 +47,11 @@ export async function generateMetadata({
 }: {
   params: Promise<{ asin: string }>;
 }): Promise<Metadata> {
+  const t = await getTranslations("GiftDetail");
   const { asin } = await params;
-  // ASIN 格式不合法 → 直接返回 404 标题，不打到 DB
-  if (!ASIN_RE.test(asin)) return { title: "Gift not found — GiftHive" };
+  if (!ASIN_RE.test(asin)) return { title: t("notFound") };
   const product = await getProductByAsin(asin);
-  if (!product) return { title: "Gift not found — GiftHive" };
+  if (!product) return { title: t("notFound") };
   return {
     title: `${product.name} — GiftHive`,
     description: product.description,
@@ -73,9 +68,9 @@ export default async function GiftDetailPage({
 }: {
   params: Promise<{ asin: string }>;
 }) {
+  const t = await getTranslations("GiftDetail");
   const { asin } = await params;
 
-  // 0. ASIN 格式校验：不是 10 位大写字母数字 → 直接 404（避免无效查询 + 减少 5xx 概率）
   if (!ASIN_RE.test(asin)) {
     notFound();
   }
@@ -93,7 +88,6 @@ export default async function GiftDetailPage({
 
   const gift = productToGift(product);
 
-  // 相关推荐是锦上添花：异常直接吞，返回空数组，不影响详情页渲染
   let related: any[] = [];
   try {
     related = await getRelatedProducts(product, 4);
@@ -103,22 +97,21 @@ export default async function GiftDetailPage({
   }
   const relatedGifts: Gift[] = (related || []).map(productToGift);
 
-  // 人群标签 → 人类可读
   const audienceLabel = (a?: string) => {
-    const map: Record<string, string> = {
-      "for-him": "For Him",
-      "for-her": "For Her",
-      "for-kids": "For Kids",
-      "for-parents": "For Parents",
-      "for-friends": "For Friends",
-      "for-coworkers": "For Coworkers",
+    if (!a) return "";
+    const audiences: Record<string, string> = {
+      "for-him": t("audiences.for-him"),
+      "for-her": t("audiences.for-her"),
+      "for-kids": t("audiences.for-kids"),
+      "for-parents": t("audiences.for-parents"),
+      "for-friends": t("audiences.for-friends"),
+      "for-coworkers": t("audiences.for-coworkers"),
     };
-    return a ? map[a] ?? a : "";
+    return audiences[a] ?? a;
   };
 
   return (
     <article className="relative">
-      {/* 顶部留白 + 背景光晕 */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute -left-32 top-8 h-80 w-80 rounded-full bg-ember/10 blur-3xl" />
         <div className="absolute right-0 top-1/3 h-96 w-96 rounded-full bg-moss/8 blur-[80px]" />
@@ -128,7 +121,7 @@ export default async function GiftDetailPage({
         {/* 面包屑 */}
         <Reveal className="mb-8 flex items-center gap-2 text-xs text-ink/45">
           <Link href="/" className="transition-colors hover:text-ink">
-            Home
+            {t("home")}
           </Link>
           <span>/</span>
           {product.audience_tags?.[0] && (
@@ -161,7 +154,7 @@ export default async function GiftDetailPage({
               </div>
               {product.asin && (
                 <div className="absolute bottom-5 left-5 rounded-full bg-ink/85 px-3 py-1 text-[0.6rem] font-medium tracking-wider text-cream backdrop-blur-sm">
-                  ASIN · {product.asin}
+                  {t("asinLabel")} · {product.asin}
                 </div>
               )}
             </div>
@@ -172,18 +165,18 @@ export default async function GiftDetailPage({
             <div className="flex h-full flex-col">
               {/* 标签 */}
               <div className="mb-4 flex flex-wrap gap-1.5">
-                {product.audience_tags.map((t) => (
+                {product.audience_tags.map((t2) => (
                   <Link
-                    key={t}
-                    href={`/${t}`}
+                    key={t2}
+                    href={`/${t2}`}
                     className="tag-pill transition-colors hover:bg-ember/20"
                   >
-                    {audienceLabel(t)}
+                    {audienceLabel(t2)}
                   </Link>
                 ))}
-                {product.occasion_tags.map((t) => (
-                  <span key={t} className="tag-pill capitalize">
-                    {t}
+                {product.occasion_tags.map((t2) => (
+                  <span key={t2} className="tag-pill capitalize">
+                    {t2}
                   </span>
                 ))}
                 <span className="tag-pill capitalize">{product.price_range}</span>
@@ -206,7 +199,7 @@ export default async function GiftDetailPage({
                     &ldquo;{product.review_quote}&rdquo;
                   </p>
                   <p className="mt-2 text-[0.66rem] uppercase tracking-widest text-ink/40">
-                    — Verified Amazon review
+                    {t("verifiedReview")}
                   </p>
                 </blockquote>
               )}
@@ -216,15 +209,15 @@ export default async function GiftDetailPage({
                 <div className="flex items-end justify-between gap-4">
                   <div>
                     <p className="text-[0.62rem] uppercase tracking-widest text-ink/40">
-                      Price
+                      {t("price")}
                     </p>
                     <p className="mt-1 font-display text-4xl font-semibold tracking-tight text-ink">
                       {formatPrice(gift.price, gift.currency)}
                     </p>
                     <p className="mt-1.5 text-[0.66rem] leading-snug text-ink/45">
-                      Price as of Aug 2026 · Affiliate link
+                      {t("priceNote")}
                       <br />
-                      Prices may vary on Amazon.
+                      {t("priceNote2")}
                     </p>
                   </div>
                   <a
@@ -233,7 +226,7 @@ export default async function GiftDetailPage({
                     rel="sponsored nofollow noopener noreferrer"
                     className="group inline-flex items-center gap-2 rounded-full bg-ink px-7 py-4 text-sm font-medium text-cream transition-all duration-500 ease-editorial hover:bg-ember"
                   >
-                    Shop on Amazon
+                    {t("shopOnAmazon")}
                     <span className="transition-transform duration-500 ease-editorial group-hover:translate-x-1">
                       →
                     </span>
@@ -243,9 +236,7 @@ export default async function GiftDetailPage({
 
               {/* 透明披露 */}
               <p className="mt-6 text-[0.62rem] leading-relaxed text-ink/35">
-                As an Amazon Associate, GiftHive earns from qualifying purchases.
-                This page may contain affiliate links — clicking them costs you
-                nothing but supports our editorial work.
+                {t("disclosure")}
               </p>
             </div>
           </Reveal>
@@ -256,9 +247,9 @@ export default async function GiftDetailPage({
           <section className="mt-24">
             <Reveal className="mb-10 flex items-end justify-between">
               <div>
-                <span className="eyebrow">You might also like</span>
+                <span className="eyebrow">{t("youMightAlsoLike")}</span>
                 <h2 className="mt-4 font-display text-3xl font-semibold tracking-tighter text-ink md:text-4xl">
-                  More from{" "}
+                  {t("moreFrom")}{" "}
                   <span className="accent-italic text-ember-deep">
                     {audienceLabel(product.audience_tags?.[0])}
                   </span>
@@ -269,7 +260,7 @@ export default async function GiftDetailPage({
                   href={`/${product.audience_tags[0]}`}
                   className="group inline-flex items-center gap-2 text-sm font-medium text-ink/60 transition-colors hover:text-ink"
                 >
-                  See all
+                  {t("seeAll")}
                   <span className="transition-transform duration-500 ease-editorial group-hover:translate-x-1">
                     →
                   </span>
@@ -296,7 +287,7 @@ export default async function GiftDetailPage({
             <span className="transition-transform duration-500 ease-editorial group-hover:-translate-x-1">
               ←
             </span>
-            Back to home
+            {t("backToHome")}
           </Link>
         </div>
       </div>

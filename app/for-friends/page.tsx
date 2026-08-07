@@ -1,11 +1,15 @@
 import RecipientCategoryPage from "@/components/RecipientCategoryPage";
 import { getAudienceGiftsFallback } from "@/lib/supabase";
+import { getTranslations } from "next-intl/server";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "For Friends — GiftHive",
-  description:
-    "For the person you think of, without needing a reason. Gifts that say you noticed.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Category");
+  return {
+    title: `${t("forFriends.heading")} — GiftHive`,
+    description: t("forFriends.heading"),
+  };
+}
 
 export default async function ForFriendsPage() {
   const gifts = await getAudienceGiftsFallback("for-friends");
@@ -13,26 +17,8 @@ export default async function ForFriendsPage() {
 
   return (
     <RecipientCategoryPage
-      heading="For Friends"
-      label="For Friends"
       slug="for-friends"
       index={5}
-      lede={
-        <>
-          For the person you think of,{" "}
-          <span className="accent-italic text-ember-deep">
-            without needing a reason
-          </span>
-          . Gifts that say &quot;I noticed&quot; — without saying too much.
-        </>
-      }
-      marquee={[
-        "FOR FRIENDS",
-        "Close · New · Old · Far away",
-        "Gifts that say you noticed",
-        "Without saying too much",
-      ]}
-      rankedBy="the story behind it"
       gifts={gifts}
       filters={filters}
       fromPrice="$24"

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import GiftCard from "@/components/GiftCard";
 import Reveal from "@/components/Reveal";
 import ShareBar from "@/components/ShareBar";
@@ -13,52 +14,31 @@ import type { AIGift } from "@/lib/deepseek";
 const SHARE_UNLOCK_KEY = "gifthive:share_unlocked";
 const SHARE_UNLOCK_TTL = 24 * 60 * 60 * 1000; // 24h
 
-const LABELS: Record<string, Record<string, string>> = {
+// Map quiz answer values to translation keys
+const VALUE_TO_LABEL_KEY: Record<string, Record<string, string>> = {
   recipient: {
-    him: "For Him",
-    her: "For Her",
-    kids: "For Kids",
-    parents: "For Parents",
-    friends: "For Friends",
-    other: "Someone else",
+    him: "him", her: "her", kids: "kids", parents: "parents",
+    friends: "friends", other: "other",
   },
   occasion: {
-    birthday: "Birthday",
-    anniversary: "Anniversary",
-    holiday: "Holiday",
-    thanks: "Thank you",
-    apology: "An apology",
-    "no-reason": "Just because",
+    birthday: "birthday", anniversary: "anniversary", holiday: "holiday",
+    thanks: "thanks", apology: "apology", "no-reason": "noReason",
   },
   budget: {
-    "0-30": "Under $30",
-    "30-75": "$30 – $75",
-    "75-150": "$75 – $150",
-    "150-400": "$150 – $400",
-    "400+": "Over $400",
-    flexible: "Flexible",
+    "0-30": "under30", "30-75": "range30to75", "75-150": "range75to150",
+    "150-400": "range150to400", "400+": "over400", flexible: "flexible",
   },
   interests: {
-    tech: "Tech",
-    coffee: "Coffee & Tea",
-    outdoor: "Outdoors",
-    reading: "Reading",
-    cooking: "Cooking",
-    music: "Music",
+    tech: "tech", coffee: "coffee", outdoor: "outdoor",
+    reading: "reading", cooking: "cooking", music: "music",
   },
   personality: {
-    practical: "Practical",
-    romantic: "Romantic",
-    minimal: "Minimalist",
-    playful: "Playful",
+    practical: "practical", romantic: "romantic",
+    minimal: "minimal", playful: "playful",
   },
   closeness: {
-    partner: "Partner",
-    family: "Family",
-    "close-friend": "Close friend",
-    colleague: "Colleague",
-    acquaintance: "Acquaintance",
-    client: "Client",
+    partner: "partner", family: "family", "close-friend": "closeFriend",
+    colleague: "colleague", acquaintance: "acquaintance", client: "client",
   },
 };
 
@@ -70,6 +50,7 @@ type Props = {
 
 function ResultContent({ initialGifts, aiUsed, totalCandidates }: Props) {
   const params = useSearchParams();
+  const t = useTranslations("Results");
 
   const profileTags = (
     ["recipient", "occasion", "budget", "interests", "personality", "closeness"] as const
@@ -77,7 +58,8 @@ function ResultContent({ initialGifts, aiUsed, totalCandidates }: Props) {
     .map((key) => {
       const val = params.get(key);
       if (!val) return null;
-      return LABELS[key]?.[val] ?? val;
+      const labelKey = VALUE_TO_LABEL_KEY[key]?.[val];
+      return labelKey ? t(`labels.${labelKey}`) : val;
     })
     .filter(Boolean) as string[];
 
@@ -88,11 +70,18 @@ function ResultContent({ initialGifts, aiUsed, totalCandidates }: Props) {
   const recipientVal = params.get("recipient");
   const occasionVal = params.get("occasion");
   const recipientLabel = recipientVal
-    ? (LABELS.recipient?.[recipientVal] ?? recipientVal).replace(/^For\s+/i, "")
-    : "someone special";
+    ? (() => {
+        const key = VALUE_TO_LABEL_KEY.recipient?.[recipientVal];
+        const label = key ? t(`labels.${key}`) : recipientVal;
+        return label.replace(/^For\s+/i, "");
+      })()
+    : t("someoneSpecial");
   const occasionLabel = occasionVal
-    ? LABELS.occasion?.[occasionVal] ?? occasionVal
-    : "a special day";
+    ? (() => {
+        const key = VALUE_TO_LABEL_KEY.occasion?.[occasionVal];
+        return key ? t(`labels.${key}`) : occasionVal;
+      })()
+    : t("aSpecialDay");
 
   // Share-to-unlock: top 2 picks are always visible, the rest are gated.
   const [unlocked, setUnlocked] = useState(false);
@@ -132,36 +121,36 @@ function ResultContent({ initialGifts, aiUsed, totalCandidates }: Props) {
         <Reveal className="mb-12 max-w-3xl">
           <div className="flex items-center gap-3">
             <span className="font-display text-sm italic text-ink/40">
-              Your results
+              {t("eyebrow")}
             </span>
             <span className="h-px w-8 bg-ink/20" />
             {aiUsed ? (
               <span className="flex items-center gap-1.5 text-[0.62rem] font-semibold uppercase tracking-widest text-ember-deep">
                 <span className="text-sm">🤖</span>
-                {gifts.length} picked by AI from {totalCandidates} matches
+                {t("aiPicks", { count: gifts.length, total: totalCandidates || 0 })}
               </span>
             ) : (
               <span className="text-[0.62rem] font-semibold uppercase tracking-widest text-ember-deep">
-                {gifts.length} picks · ranked by how much they&apos;ll love them
+                {t("picksRanked", { count: gifts.length })}
               </span>
             )}
           </div>
           <h1 className="mt-5 font-display text-4xl font-semibold leading-[1.05] tracking-tighter text-ink md:text-6xl">
             {aiUsed ? (
               <>
-                Five picks from AI,
+                {t("aiTitle1")}
                 <br />
                 <span className="accent-italic text-ember-deep">
-                  personalized for this exact person
+                  {t("aiTitle2")}
                 </span>
                 .
               </>
             ) : (
               <>
-                Five picks for you,
+                {t("title1")}
                 <br />
                 <span className="accent-italic text-ember-deep">
-                  ranked by how much they&apos;ll love them
+                  {t("title2")}
                 </span>
                 .
               </>
@@ -169,26 +158,16 @@ function ResultContent({ initialGifts, aiUsed, totalCandidates }: Props) {
           </h1>
           <p className="mt-5 max-w-xl text-pretty leading-relaxed text-ink/60">
             {aiUsed ? (
-              <>
-                AI scanned {totalCandidates} real Amazon products and picked the 5
-                that best fit your answers. Each one comes with a{" "}
-                <span className="accent-italic text-ink">
-                  personalized reason
-                </span>{" "}
-                — if it lands, it&apos;s the one.
-              </>
+              t("aiDesc", { total: totalCandidates || 0 })
             ) : (
-              <>
-                Based on what you just told us. Each one comes with a &quot;why&quot;
-                — if the reason lands, it&apos;s the one. If not, the next one down.
-              </>
+              t("desc")
             )}
           </p>
 
           {profileTags.length > 0 && (
             <div className="mt-7 flex flex-wrap items-center gap-3 rounded-2xl border border-ink/8 bg-cream-warm/40 p-4 glass">
               <span className="text-[0.62rem] font-semibold uppercase tracking-widest text-ink/45">
-                Your profile
+                {t("yourProfile")}
               </span>
               <div className="flex flex-wrap gap-2">
                 {profileTags.map((tag) => (
@@ -209,7 +188,7 @@ function ResultContent({ initialGifts, aiUsed, totalCandidates }: Props) {
                 totalPicks={gifts.length || 5}
               />
               <span className="text-[0.62rem] text-ink/40">
-                Save a card of your top pick to share
+                {t("saveCard")}
               </span>
             </div>
           )}
@@ -218,12 +197,12 @@ function ResultContent({ initialGifts, aiUsed, totalCandidates }: Props) {
         {featured ? (
           <div className="grid gap-5 md:grid-cols-2">
             <Reveal className="md:col-span-2">
-              <GiftCard gift={featured} index={1} featured ctaLabel="Shop now" />
+              <GiftCard gift={featured} index={1} featured ctaLabel={t("shopNow")} />
             </Reveal>
 
             {visibleRest.map((gift, i) => (
               <Reveal key={gift.id} delay={i * 80}>
-                <GiftCard gift={gift} index={i + 2} ctaLabel="Shop now" />
+                <GiftCard gift={gift} index={i + 2} ctaLabel={t("shopNow")} />
               </Reveal>
             ))}
 
@@ -243,26 +222,24 @@ function ResultContent({ initialGifts, aiUsed, totalCandidates }: Props) {
                             §
                           </span>
                           <span className="text-[0.62rem] font-semibold uppercase tracking-widest text-ember-deep">
-                            {lockedPicks.length} more picks locked
+                            {t("lockedPicks", { count: lockedPicks.length })}
                           </span>
                         </div>
                         <h3 className="mt-3 font-display text-2xl font-semibold leading-tight tracking-tighter text-ink md:text-3xl">
-                          AI has {lockedPicks.length} more picks
+                          {t("aiHasMore", { count: lockedPicks.length })}
                           {profileTags[0]
-                            ? ` for ${profileTags[0].toLowerCase()}`
+                            ? ` ${profileTags[0].toLowerCase()}`
                             : ""}
                           .
                         </h3>
                         <p className="mt-2 text-pretty text-sm leading-relaxed text-ink/60">
-                          Share GiftHive with a friend who&apos;s always stuck
-                          on what to gift — we&apos;ll reveal the rest
-                          instantly.
+                          {t("lockedDesc")}
                         </p>
                       </div>
                       <div className="flex flex-col gap-3">
                         <ShareBar onShare={handleShare} />
                         <p className="text-right text-[0.6rem] text-ink/40">
-                          Unlocks instantly · stays open for 24h
+                          {t("unlocksInstantly")}
                         </p>
                       </div>
                     </div>
@@ -284,7 +261,7 @@ function ResultContent({ initialGifts, aiUsed, totalCandidates }: Props) {
         ) : (
           <div className="rounded-[2rem] border border-ink/8 bg-cream-warm/40 p-12 text-center">
             <p className="font-display text-xl italic text-ink/50">
-              No picks yet — add some products in Supabase and try again.
+              {t("noPicks")}
             </p>
           </div>
         )}
@@ -298,17 +275,16 @@ function ResultContent({ initialGifts, aiUsed, totalCandidates }: Props) {
                   <div className="flex items-center gap-2">
                     <span className="text-lg">🐝</span>
                     <span className="text-[0.62rem] font-semibold uppercase tracking-widest text-ember-deep">
-                      Hive Reveal
+                      {t("hiveReveal")}
                     </span>
                   </div>
                   <h3 className="mt-2 font-display text-xl font-semibold tracking-tighter text-ink md:text-2xl">
-                    Leave them a gift note they tap to open.
+                    {t("hiveRevealTitle")}
                   </h3>
                   <p className="mt-2 text-pretty text-sm leading-relaxed text-ink/60">
-                    Write a sweet message about your top pick. They get a
-                    mystery link — tap to reveal your note and the gift.
+                    {t("hiveRevealDesc")}
                     <span className="accent-italic text-ink">
-                      {" "}Like a digital gift tag.
+                      {" "}{t("hiveRevealCta")}
                     </span>
                   </p>
                 </div>
@@ -317,7 +293,7 @@ function ResultContent({ initialGifts, aiUsed, totalCandidates }: Props) {
                   className="group inline-flex shrink-0 items-center gap-2 rounded-full bg-ink px-6 py-3.5 text-xs font-medium text-cream transition-all duration-500 ease-editorial hover:bg-ember"
                 >
                   <span className="text-sm">✦</span>
-                  Create a reveal card
+                  {t("createRevealCard")}
                 </button>
               </div>
             </div>
@@ -333,23 +309,22 @@ function ResultContent({ initialGifts, aiUsed, totalCandidates }: Props) {
                     §
                   </span>
                   <span className="text-[0.62rem] font-semibold uppercase tracking-widest text-ember-deep">
-                    Not quite right?
+                    {t("notQuiteRight")}
                   </span>
                 </div>
                 <h3 className="mt-3 font-display text-2xl font-semibold tracking-tighter text-ink md:text-3xl">
-                  Retake with a new profile, or browse the categories.
+                  {t("retakeTitle")}
                 </h3>
                 <p className="mt-2 max-w-lg text-pretty text-sm leading-relaxed text-ink/60">
-                  Sometimes scrolling beats answering when it comes to finding{" "}
-                  <span className="accent-italic text-ink">&quot;the one&quot;</span>.
+                  {t("retakeDesc")}
                 </p>
               </div>
               <div className="flex flex-wrap gap-3">
                 <Link href="/quiz" className="group btn-primary">
-                  <span>Retake</span>
+                  <span>{t("retake")}</span>
                 </Link>
                 <a href="/for-him" className="btn-ghost">
-                  Browse
+                  {t("browse")}
                 </a>
               </div>
             </div>
@@ -357,16 +332,11 @@ function ResultContent({ initialGifts, aiUsed, totalCandidates }: Props) {
         </Reveal>
 
         <p className="mt-10 text-center text-xs leading-relaxed text-ink/40">
-          These picks contain affiliate links. If you buy through a link, we may
-          earn a commission — it{" "}
-          <span className="accent-italic text-ink/60">
-            doesn&apos;t change what you pay
-          </span>
-          . Ranking is editorial, not commission-driven.
+          {t("affiliateNote")}
           {aiUsed && (
             <>
               {" "}
-              AI recommendations are generated by DeepSeek and reviewed editorially.
+              {t("aiNote")}
             </>
           )}
         </p>
@@ -390,12 +360,14 @@ export default function ResultsClient({
   aiUsed = false,
   totalCandidates = 0,
 }: Props) {
+  const t = useTranslations("Results");
+
   return (
     <Suspense
       fallback={
         <div className="mx-auto max-w-3xl px-5 py-32 text-center">
           <p className="font-display text-2xl italic text-ink/50">
-            Loading your results…
+            {t("loading")}
           </p>
         </div>
       }

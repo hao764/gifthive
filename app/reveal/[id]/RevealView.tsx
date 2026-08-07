@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { markRevealed, type Reveal } from "@/lib/supabase";
 
 type Props = { reveal: Reveal };
 
 export default function RevealView({ reveal }: Props) {
+  const t = useTranslations("Reveal");
   const [revealed, setRevealed] = useState(reveal.revealed_at !== null);
   const [revealing, setRevealing] = useState(false);
 
@@ -18,7 +20,7 @@ export default function RevealView({ reveal }: Props) {
 
   const senderLabel = reveal.sender_name
     ? reveal.sender_name
-    : "Someone special";
+    : t("someoneSpecial");
 
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden">
@@ -38,19 +40,19 @@ export default function RevealView({ reveal }: Props) {
             </div>
 
             <p className="font-display text-sm italic text-ink/40">
-              Hive Reveal
+              {t("hiveReveal")}
             </p>
             <h1 className="mt-3 font-display text-4xl font-semibold leading-tight tracking-tighter text-ink md:text-5xl">
-              {senderLabel} left you
+              {t("someoneLeftYou", { sender: senderLabel })}
               <br />
               <span className="accent-italic text-ember-deep">
-                a gift message
+                {t("giftMessage")}
               </span>
             </h1>
             <p className="mx-auto mt-5 max-w-sm text-pretty leading-relaxed text-ink/60">
               {reveal.recipient_name
-                ? `Hi ${reveal.recipient_name} — there's a note and a gift pick waiting for you.`
-                : "There's a note and a gift pick waiting for you."}
+                ? t("hiNote", { name: reveal.recipient_name })
+                : t("genericNote")}
             </p>
 
             <button
@@ -61,11 +63,11 @@ export default function RevealView({ reveal }: Props) {
               <span className="text-lg transition-transform duration-500 ease-editorial group-hover:scale-110">
                 ✦
               </span>
-              {revealing ? "Opening…" : "Tap to reveal"}
+              {revealing ? t("opening") : t("tapToReveal")}
             </button>
 
             <p className="mt-6 text-[0.62rem] uppercase tracking-widest text-ink/30">
-              Powered by GiftHive
+              {t("poweredBy")}
             </p>
           </div>
         ) : (
@@ -76,8 +78,8 @@ export default function RevealView({ reveal }: Props) {
                 <span className="text-3xl">💌</span>
               </div>
               <p className="font-display text-sm italic text-ink/40">
-                From {senderLabel}
-                {reveal.recipient_name && ` to ${reveal.recipient_name}`}
+                {t("from", { sender: senderLabel })}
+                {reveal.recipient_name && t("to", { name: reveal.recipient_name })}
               </p>
             </div>
 
@@ -118,7 +120,7 @@ export default function RevealView({ reveal }: Props) {
                   )}
                   <div className="flex flex-1 flex-col justify-center p-6">
                     <p className="text-[0.62rem] font-semibold uppercase tracking-widest text-ember-deep">
-                      🎁 The gift {senderLabel} chose
+                      🎁 {t("giftChose", { sender: senderLabel })}
                     </p>
                     <h3 className="mt-2 font-display text-lg font-semibold tracking-tight text-ink">
                       {reveal.gift_name}
@@ -136,21 +138,19 @@ export default function RevealView({ reveal }: Props) {
             {/* CTA */}
             <div className="mt-8 rounded-[2rem] border border-ink/8 bg-gradient-to-br from-cream-warm/60 to-cream-paper p-7 text-center">
               <p className="font-display text-sm italic text-ember-deep">
-                Want picks this good?
+                {t("wantPicks")}
               </p>
               <h3 className="mt-2 font-display text-2xl font-semibold tracking-tighter text-ink">
-                Take the 30-second gift quiz.
+                {t("takeQuiz")}
               </h3>
               <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-ink/60">
-                Answer a few questions about who you&apos;re shopping for. AI
-                picks 5 gifts from real Amazon products — each with a
-                personalized reason.
+                {t("quizDesc")}
               </p>
               <Link
                 href="/quiz"
                 className="group mt-5 inline-flex items-center gap-2 rounded-full bg-ink px-7 py-3.5 text-sm font-medium text-cream transition-all duration-500 ease-editorial hover:bg-ember"
               >
-                Take the quiz
+                {t("takeQuizBtn")}
                 <span className="transition-transform duration-500 ease-editorial group-hover:translate-x-1">
                   →
                 </span>
@@ -158,7 +158,7 @@ export default function RevealView({ reveal }: Props) {
             </div>
 
             <p className="mt-6 text-center text-[0.62rem] uppercase tracking-widest text-ink/30">
-              GiftHive · AI-curated gifts
+              {t("footerTag")}
             </p>
           </div>
         )}

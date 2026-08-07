@@ -2,14 +2,20 @@ import Link from "next/link";
 import Reveal from "@/components/Reveal";
 import Marquee from "@/components/Marquee";
 import { articles } from "@/lib/data";
+import { getTranslations } from "next-intl/server";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "The Journal — GiftHive",
-  description:
-    "Short, honest pieces on how to give better — without the catalog stuff.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Journal");
+  return {
+    title: t("metaTitle"),
+    description: t("metaDesc"),
+  };
+}
 
-export default function JournalIndexPage() {
+export default async function JournalIndexPage() {
+  const t = await getTranslations("Journal");
+
   return (
     <>
       {/* ============ Hero ============ */}
@@ -22,27 +28,25 @@ export default function JournalIndexPage() {
         <div className="mx-auto max-w-7xl px-5 pb-14 pt-10 md:px-8 md:pb-20 md:pt-16">
           <Reveal>
             <div className="flex items-center gap-4 text-[0.66rem] uppercase tracking-widest text-ink/40">
-              <span className="font-display italic">GiftHive</span>
+              <span className="font-display italic">{t("brandLine")}</span>
               <span className="h-px flex-1 bg-ink/10" />
-              <span className="font-display italic">The Gift Journal · EST. 2026</span>
+              <span className="font-display italic">{t("estLine")}</span>
             </div>
           </Reveal>
 
           <Reveal delay={80}>
-            <span className="eyebrow mt-10 inline-block">No. 05 · Journal</span>
+            <span className="eyebrow mt-10 inline-block">{t("sectionIndex")}</span>
           </Reveal>
 
           <Reveal delay={140}>
             <h1 className="mt-5 max-w-3xl font-display text-4xl font-semibold leading-[1.08] tracking-tighter text-ink md:text-6xl md:text-[4rem]">
-              The Journal
+              {t("title")}
             </h1>
           </Reveal>
 
           <Reveal delay={200}>
             <p className="mt-5 max-w-xl text-pretty text-lg leading-relaxed text-ink/65 md:text-xl">
-              Short, honest pieces on how to give better — without the catalog
-              stuff. No sponsored fluff. Every pick is something we&apos;d
-              actually hand to someone we like.
+              {t("description")}
             </p>
           </Reveal>
         </div>
@@ -51,10 +55,10 @@ export default function JournalIndexPage() {
       {/* ============ Marquee ============ */}
       <Marquee
         items={[
-          "THE GIFT JOURNAL",
-          "Short · Honest · Considered",
-          "No catalog fluff",
-          "Read two lines, give the right thing",
+          t("marquee.line1"),
+          t("marquee.line2"),
+          t("marquee.line3"),
+          t("marquee.line4"),
         ]}
       />
 
@@ -82,7 +86,7 @@ export default function JournalIndexPage() {
                       {article.category}
                     </span>
                     <span className="absolute right-4 top-4 font-display text-xs italic text-cream/85">
-                      N° {String(i + 1).padStart(2, "0")}
+                      {t("numberPrefix")} {String(i + 1).padStart(2, "0")}
                     </span>
                   </div>
 
@@ -98,7 +102,7 @@ export default function JournalIndexPage() {
                       {article.excerpt}
                     </p>
                     <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-ink transition-all duration-500 ease-editorial group-hover:gap-3">
-                      Keep reading
+                      {t("keepReading")}
                       <span>→</span>
                     </span>
                   </div>

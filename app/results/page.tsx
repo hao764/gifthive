@@ -2,15 +2,18 @@ import ResultsClient from "./page.client";
 import { fetchProducts, getRecommendedGiftsFallback } from "@/lib/supabase";
 import { getAIGiftRecommendations, type AIGift } from "@/lib/deepseek";
 import { productToGift } from "@/lib/data";
+import { getTranslations } from "next-intl/server";
+import type { Metadata } from "next";
 
-// Cloudflare Pages 需要 Edge Runtime
 export const runtime = "edge";
 
-export const metadata = {
-  title: "Your Results — GiftHive",
-  description:
-    "Personalized gift picks based on your answers. Five things, ranked by how much they'll love them.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Results");
+  return {
+    title: t("metaTitle"),
+    description: t("metaDesc"),
+  };
+}
 
 const RECIPIENT_MAP: Record<string, string> = {
   him: "for-him",

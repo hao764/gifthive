@@ -1,14 +1,18 @@
 import { getReveal } from "@/lib/supabase";
 import RevealView from "./RevealView";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
+import type { Metadata } from "next";
 
-// Cloudflare Pages 需要 Edge Runtime
 export const runtime = "edge";
 
-export const metadata = {
-  title: "A gift message waiting for you — GiftHive",
-  description: "Someone left you a gift note. Tap to reveal.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Reveal");
+  return {
+    title: t("metaTitle"),
+    description: t("metaDesc"),
+  };
+}
 
 // Reveal id 是 UUID v4（Supabase generate uuid()），长度 36
 // 任何不符合格式的直接 404，避免把无谓查询打到 DB，也避免潜在 5xx

@@ -10,6 +10,11 @@ type Props = {
   onSelect: (value: string) => void;
   onNext: () => void;
   onBack: () => void;
+  labels: {
+    back: string;
+    next: string;
+    seeResults: string;
+  };
 };
 
 export default function QuizStep({
@@ -20,6 +25,7 @@ export default function QuizStep({
   onSelect,
   onNext,
   onBack,
+  labels,
 }: Props) {
   const progress = Math.round((current / total) * 100);
   const isLast = current === total;
@@ -139,7 +145,7 @@ export default function QuizStep({
           <span className="transition-transform duration-500 ease-editorial group-hover:-translate-x-0.5">
             ←
           </span>
-          Back
+          {labels.back}
         </button>
 
         <button
@@ -148,7 +154,7 @@ export default function QuizStep({
           disabled={!canProceed}
           className="group inline-flex items-center gap-2 overflow-hidden rounded-full bg-ink px-7 py-3.5 text-sm font-medium text-cream transition-all duration-500 ease-editorial hover:bg-ember disabled:cursor-not-allowed disabled:bg-ink/25"
         >
-          <span>{isLast ? "See my results" : "Next"}</span>
+          <span>{isLast ? labels.seeResults : labels.next}</span>
           <span className="transition-transform duration-500 ease-editorial group-hover:translate-x-0.5">
             →
           </span>
