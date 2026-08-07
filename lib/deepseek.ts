@@ -1,19 +1,97 @@
 import type { Gift } from "./data";
 
-const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
-const DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions";
+/* ===========================================================================
+ * AI Provider Router — 多供应商自动降级
+ *
+ * 优先级（有 key 就启用，按顺序调用，前一个失败立刻切下一个，都没 key
+ * 就直接 return null 让上层走规则 fallback，绝不会抛到 5xx）：
+ *
+ *   1) DEEPSEEK        https://api.deepseek.com/v1/chat/completions
+ *                       — 国内便宜好用，默认首选
+ *   2) OPENROUTER       https://openrouter.ai/api/v1/chat/completions
+ *                       — 海外聚合，一个 key 调几十家模型（推荐做首选备线）
+ *   3) TOGETHER         https://api.together.xyz/v1/chat/completions
+ *                       — 海外老牌，稳定便宜
+ *   4) OPENAI (官方)    https://api.openai.com/v1/chat/completions
+ *                       — 兜底，GPT-4o-mini 稳定得很
+ *
+ * 所有供应商都是 OpenAI chat completions 兼容格式，因此请求/响应解析
+ * 走同一套代码，只在 baseURL / 默认模型 / headers 上有微小差异。
+ *
+ * 新增/替换 provider 只需要在 PROVIDER_SPECS 里加一条就行。
+ * ========================================================================= */
+
+type ProviderName = "DEEPSEEK" | "OPENROUTER" | "TOGETHER" | "OPENAI";
+
+type ProviderSpec = {
+  name: ProviderName;
+  /** 哪个 env var 存在就启用这个 provider */
+  apiKeyEnv: string;
+  baseURL: string;
+  /** 该 provider 默认模型（用户可以用 *_MODEL 覆盖） */
+  defaultModel: string;
+  /** 额外 header，比如 OpenRouter 要传 HTTP-Referer / X-Title 做排名 */
+  extraHeaders?: Record<string, string>;
+};
+
+const PROVIDER_SPECS: ProviderSpec[] = [
+  {
+    name: "DEEPSEEK",
+    apiKeyEnv: "DEEPSEEK_API_KEY",
+    baseURL: "https://api.deepseek.com/v1/chat/completions",
+    defaultModel: process.env.DEEPSEEK_MODEL || "deepseek-chat",
+  },
+  {
+    name: "OPENROUTER",
+    apiKeyEnv: "OPENROUTER_API_KEY",
+    baseURL: "https://openrouter.ai/api/v1/chat/completions",
+    defaultModel: process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini",
+    extraHeaders: {
+      "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL || "https://gifthive.pages.dev",
+      "X-Title": "GiftHive — Gift Finder",
+    },
+  },
+  {
+    name: "TOGETHER",
+    apiKeyEnv: "TOGETHER_API_KEY",
+    baseURL: "https://api.together.xyz/v1/chat/completions",
+    defaultModel: process.env.TOGETHER_MODEL || "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+  },
+  {
+    name: "OPENAI",
+    apiKeyEnv: "OPENAI_API_KEY",
+    baseURL: "https://api.openai.com/v1/chat/completions",
+    defaultModel: process.env.OPENAI_MODEL || "gpt-4o-mini",
+  },
+];
+
+/** 算出当前可用的 provider 顺序（有 key 的才启用） */
+function getEnabledProviders(): ProviderSpec[] {
+  const out: ProviderSpec[] = [];
+  for (const p of PROVIDER_SPECS) {
+    const key = (process.env as Record<string, string | undefined>)[p.apiKeyEnv];
+    if (key && key.trim().length > 0) out.push(p);
+  }
+  return out;
+}
 
 export type AIGift = Gift & {
   aiReason?: string;
   aiMatchScore?: number;
+  /** 旧字段兼容，老代码里可能还在写 reason/match */
+  reason?: string;
+  match?: number;
 };
 
 export type AIResult = {
   picks: AIGift[];
   totalCandidates: number;
   used: boolean;
+  /** 这次实际上是哪一个 provider 出的结果（方便日志定位） */
+  provider?: ProviderName;
 };
 
+/* -------------------- 题目答案 → 英文 User Profile -------------------- */
 const BUDGET_MAP: Record<string, string> = {
   "0-30": "Under $30",
   "30-75": "$30 – $75",
@@ -68,148 +146,264 @@ const CLOSENESS_MAP: Record<string, string> = {
 
 function formatQuizAnswers(answers: Record<string, string | undefined>): string {
   const lines: string[] = [];
-
-  // Helper: extract custom text if value starts with "custom:"
   const getCustom = (val?: string): string | null => {
     if (val && val.startsWith("custom:")) return val.slice(7);
     return null;
   };
-
   if (answers.recipient) {
-    const custom = getCustom(answers.recipient);
-    lines.push(`- Gift recipient: ${custom ?? RECIPIENT_MAP[answers.recipient] ?? answers.recipient}`);
+    const c = getCustom(answers.recipient);
+    lines.push(
+      `- Gift recipient: ${c ?? RECIPIENT_MAP[answers.recipient] ?? answers.recipient}`
+    );
   }
   if (answers.occasion) {
-    const custom = getCustom(answers.occasion);
-    lines.push(`- Occasion: ${custom ?? OCCASION_MAP[answers.occasion] ?? answers.occasion}`);
+    const c = getCustom(answers.occasion);
+    lines.push(
+      `- Occasion: ${c ?? OCCASION_MAP[answers.occasion] ?? answers.occasion}`
+    );
   }
   if (answers.budget) {
-    const custom = getCustom(answers.budget);
-    lines.push(`- Budget: ${custom ?? BUDGET_MAP[answers.budget] ?? answers.budget}`);
+    const c = getCustom(answers.budget);
+    lines.push(`- Budget: ${c ?? BUDGET_MAP[answers.budget] ?? answers.budget}`);
   }
   if (answers.interests) {
-    const custom = getCustom(answers.interests);
-    lines.push(`- Interests: ${custom ?? INTERESTS_MAP[answers.interests] ?? answers.interests}`);
+    const c = getCustom(answers.interests);
+    lines.push(
+      `- Interests: ${c ?? INTERESTS_MAP[answers.interests] ?? answers.interests}`
+    );
   }
   if (answers.personality) {
-    const custom = getCustom(answers.personality);
-    lines.push(`- Personality: ${custom ?? PERSONALITY_MAP[answers.personality] ?? answers.personality}`);
+    const c = getCustom(answers.personality);
+    lines.push(
+      `- Personality: ${c ?? PERSONALITY_MAP[answers.personality] ?? answers.personality}`
+    );
   }
   if (answers.closeness) {
-    const custom = getCustom(answers.closeness);
-    lines.push(`- Relationship closeness: ${custom ?? CLOSENESS_MAP[answers.closeness] ?? answers.closeness}`);
+    const c = getCustom(answers.closeness);
+    lines.push(
+      `- Relationship closeness: ${
+        c ?? CLOSENESS_MAP[answers.closeness] ?? answers.closeness
+      }`
+    );
   }
   return lines.join("\n");
 }
 
+/* -------------------- Edge 兼容的超时控制器 -------------------- */
+/**
+ * Cloudflare Pages Edge Runtime 里 AbortSignal.timeout() 经常不支持（或
+ * 直接抛 TypeError）。我们手写 controller + setTimeout，保证任何环境都
+ * 能在固定 ms 后 abort fetch。
+ */
+function makeTimeoutSignal(ms: number): { signal?: AbortSignal; clear: () => void } {
+  try {
+    if (typeof AbortController === "undefined") return { clear: () => {} };
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => {
+      try { ctrl.abort(); } catch (_) { /* noop */ }
+    }, ms);
+    return {
+      signal: ctrl.signal,
+      clear: () => clearTimeout(timer),
+    };
+  } catch (_) {
+    return { clear: () => {} };
+  }
+}
+
+/* -------------------- 模型输出 JSON 解析（容错） -------------------- */
+/**
+ * 模型偶尔会在 JSON 外面再包一层 ```json ... ```，或者输出多余逗号、
+ * 末尾有废话。这里做宽松解析，能解析就解析，解析不出来再返回 undefined。
+ */
+function looseParseJSON<T = unknown>(raw: string): T | undefined {
+  let s = raw.trim();
+  // 去掉 ```json / ``` 包裹
+  const fence = s.match(/^```(?:json)?\s*([\s\S]*?)```$/i);
+  if (fence) s = fence[1].trim();
+  // 尝试直接解析
+  try { return JSON.parse(s) as T; } catch (_) { /* continue */ }
+  // 取第一个 { 到最后一个 } 之间的内容，再试一次
+  const firstL = s.indexOf("{");
+  const lastR = s.lastIndexOf("}");
+  if (firstL >= 0 && lastR > firstL) {
+    try { return JSON.parse(s.slice(firstL, lastR + 1)) as T; } catch (_) { /* continue */ }
+  }
+  // 取第一个 [ 到最后一个 ]（极端情况）
+  const firstBL = s.indexOf("[");
+  const lastBR = s.lastIndexOf("]");
+  if (firstBL >= 0 && lastBR > firstBL) {
+    try { return JSON.parse(s.slice(firstBL, lastBR + 1)) as T; } catch (_) { /* continue */ }
+  }
+  return undefined;
+}
+
+/* -------------------- 单个 provider 调用 -------------------- */
+type RawPick = { product_id: string; reason?: string; match_score?: number };
+type RawResponse = { picks: RawPick[] };
+
+async function callOneProvider(
+  provider: ProviderSpec,
+  payload: {
+    system: string;
+    user: string;
+    outputMaxTokens: number;
+  },
+  timeoutMs: number
+): Promise<{ ok: true; picks: RawPick[] } | { ok: false; err: unknown }> {
+  const apiKey = (process.env as Record<string, string | undefined>)[provider.apiKeyEnv];
+  if (!apiKey) return { ok: false, err: `missing env ${provider.apiKeyEnv}` };
+
+  const { signal, clear } = makeTimeoutSignal(timeoutMs);
+  try {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+      ...(provider.extraHeaders || {}),
+    };
+
+    const resp = await fetch(provider.baseURL, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        model: provider.defaultModel,
+        messages: [
+          { role: "system", content: payload.system },
+          { role: "user", content: payload.user },
+        ],
+        temperature: 0.7,
+        max_tokens: payload.outputMaxTokens,
+        // response_format=json_object 不是所有提供商都支持，只给确定支持的两家发
+        ...(provider.name === "DEEPSEEK" || provider.name === "OPENAI"
+          ? { response_format: { type: "json_object" as const } }
+          : {}),
+      }),
+      signal,
+    });
+
+    if (!resp.ok) {
+      const text = await resp.text().catch(() => "");
+      return {
+        ok: false,
+        err: `HTTP ${resp.status} ${resp.statusText} — ${text.slice(0, 240)}`,
+      };
+    }
+
+    const json = await resp.json().catch(() => undefined as any);
+    const content: string | undefined =
+      json?.choices?.[0]?.message?.content ??
+      json?.choices?.[0]?.text ??
+      undefined;
+
+    if (!content) return { ok: false, err: "no content in response" };
+
+    const parsed = looseParseJSON<RawResponse>(content);
+    if (!parsed || !parsed.picks || !Array.isArray(parsed.picks)) {
+      return { ok: false, err: `bad JSON shape in content: ${content.slice(0, 120)}` };
+    }
+    return { ok: true, picks: parsed.picks };
+  } catch (err) {
+    return { ok: false, err };
+  } finally {
+    clear();
+  }
+}
+
+/* -------------------- 导出的主函数 -------------------- */
 export async function getAIGiftRecommendations(
   quizAnswers: Record<string, string | undefined>,
   candidates: Gift[]
 ): Promise<AIResult | null> {
-  if (!DEEPSEEK_API_KEY || candidates.length === 0) {
+  if (!candidates || candidates.length === 0) return null;
+
+  const providers = getEnabledProviders();
+  if (providers.length === 0) {
+    // 没有任何一个 provider 的 key 配置 → 直接跳过，安静返回 null
+    // （本地 / 刚部署忘加 secret 的常态，绝不能 5xx）
     return null;
   }
 
-  try {
-    const userProfile = formatQuizAnswers(quizAnswers);
-    const productCatalog = candidates.map((g) => ({
-      id: g.id,
-      name: g.name,
-      price: g.price,
-      description: g.tagline || g.name,
-      category: g.category,
-    }));
+  const userProfile = formatQuizAnswers(quizAnswers);
+  const productCatalog = candidates.map((g) => ({
+    id: g.id,
+    name: g.name,
+    price: g.price,
+    description: g.tagline || g.name,
+    category: g.category,
+  }));
 
-    const systemPrompt = `You are an expert gift curator. Given a user's gift-giving profile and a catalog of real Amazon products, pick the 5 best-matching gifts. The user may provide custom descriptions instead of preset categories — treat these as the most accurate expression of their intent and prioritize them. For each pick, write a personalized 1-2 sentence reason explaining WHY this specific gift fits THIS specific person. Be specific — reference their interests, personality, or relationship. Give a match score 0-100. Return ONLY valid JSON, no markdown.`;
+  const systemPrompt = [
+    "You are an expert gift curator. Given a user's gift-giving profile and a catalog of real products,",
+    "pick the BEST 5 gifts that fit them. The user may provide custom descriptions instead of preset categories —",
+    "treat custom descriptions as the MOST accurate expression of their intent and prioritize them over presets.",
+    "",
+    "For each pick, write a personalized 1-2 sentence reason explaining WHY this specific gift fits THIS specific person.",
+    "Be specific: reference their interests, personality, occasion, relationship, or budget constraints.",
+    "",
+    "Return ONLY valid JSON matching this shape (no markdown, no preamble, no explanation outside JSON):",
+    '{"picks":[{"product_id":"<catalog.id>","reason":"<personalized 1-2 sentences>","match_score":<0-100 integer>}]}',
+  ].join(" ");
 
-    const userPrompt = `User's gift-giving profile:
-${userProfile}
+  // 英文用户 → 英文写 reason；中文/日文 → 仍然用英文写 reason（因为商品都是 Amazon 英文，
+  // 海外用户占绝大多数；UI 侧如果要 i18n 可以以后再做 reason 翻译）。这里故意强制英文。
+  const userPrompt = `User's gift-giving profile:\n${userProfile}\n\nAvailable products (pick exactly the best 5, fewer only if the catalog is very small):\n${JSON.stringify(
+    productCatalog,
+    null,
+    2
+  )}\n\nReturn ONLY JSON as specified above. Do not invent product_ids that are not in the catalog.`;
 
-Available products (pick the best 5):
-${JSON.stringify(productCatalog, null, 2)}
+  // 每个 provider 的超时时间递减：第一个给宽一点，后面快切
+  const timeouts = [10_000, 7_000, 6_000, 5_000];
 
-Return ONLY this JSON format:
-{"picks":[{"product_id":"<id>","reason":"<1-2 sentence personalized reason>","match_score":<0-100>}]}`;
+  for (let i = 0; i < providers.length; i++) {
+    const p = providers[i];
+    const ms = timeouts[i] ?? 5_000;
+    const res = await callOneProvider(
+      p,
+      { system: systemPrompt, user: userPrompt, outputMaxTokens: 1400 },
+      ms
+    );
 
-    // ----- 关键修复：Edge Runtime 兼容的超时控制 -----
-    // 部分 Cloudflare / Vercel Edge Runtime 不支持 AbortSignal.timeout()，
-    // 直接用会抛 TypeError → 导致整页 5xx。这里手写 controller + setTimeout。
-    let timeoutTimer: ReturnType<typeof setTimeout> | undefined;
-    let controller: AbortController | undefined;
-    try {
-      if (typeof AbortController !== "undefined") {
-        controller = new AbortController();
-        const ms = 8000;
-        timeoutTimer = setTimeout(() => {
-          try { controller?.abort(); } catch (_) { /* noop */ }
-        }, ms);
-      }
-    } catch (_) {
-      controller = undefined;
-      timeoutTimer = undefined;
+    if (!res.ok) {
+      // 结构化日志：[AI] provider=X error=...
+      // 但绝不抛出，直接试下一个 provider
+      const msg = res.err instanceof Error ? res.err.message : String(res.err);
+      console.error(`[AI] ${p.name} failed (${ms}ms timeout): ${msg}`);
+      continue;
     }
 
-    try {
-      const response = await fetch(DEEPSEEK_API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: "deepseek-chat",
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt },
-          ],
-          temperature: 0.7,
-          max_tokens: 1200,
-          response_format: { type: "json_object" },
-        }),
-        signal: controller?.signal,
+    const picks: AIGift[] = [];
+    for (const raw of res.picks.slice(0, 5)) {
+      const gift = candidates.find((g) => g.id === raw.product_id);
+      if (!gift) continue;
+      const score = typeof raw.match_score === "number" ? raw.match_score : 0;
+      picks.push({
+        ...gift,
+        aiReason: raw.reason ?? gift.reason ?? "",
+        aiMatchScore: score,
+        reason: raw.reason ?? gift.reason,
+        match: score,
       });
-
-      if (!response.ok) {
-        // 把 HTTP 错误静默吞掉，上层走 fallback
-        console.error("DeepSeek API error:", response.status);
-        return null;
-      }
-
-      const data = await response.json();
-      const content = data.choices?.[0]?.message?.content;
-      if (!content) return null;
-
-      const parsed = JSON.parse(content);
-      if (!parsed.picks || !Array.isArray(parsed.picks)) return null;
-
-      const picks: AIGift[] = [];
-      for (const pick of parsed.picks.slice(0, 5)) {
-        const gift = candidates.find((g) => g.id === pick.product_id);
-        if (gift) {
-          picks.push({
-            ...gift,
-            reason: pick.reason || gift.reason,
-            match: typeof pick.match_score === "number" ? pick.match_score : 0,
-            aiReason: pick.reason || "",
-            aiMatchScore: typeof pick.match_score === "number" ? pick.match_score : 0,
-          });
-        }
-      }
-
-      if (picks.length === 0) return null;
-
-      return {
-        picks,
-        totalCandidates: candidates.length,
-        used: true,
-      };
-    } finally {
-      if (timeoutTimer) clearTimeout(timeoutTimer);
     }
-  } catch (err) {
-    // 任何异常（包括网络、超时、解析、AbortError）
-    // 一律返回 null，让上层走 fallback，绝不抛 5xx
-    console.error("DeepSeek API call failed:", err);
-    return null;
+
+    if (picks.length === 0) {
+      console.warn(`[AI] ${p.name} returned 0 valid picks (${res.picks.length} raw) → try next provider`);
+      continue;
+    }
+
+    // 成功路径
+    console.log(
+      `[AI] ${p.name} OK — ${picks.length} picks from ${candidates.length} candidates in ≤${ms}ms`
+    );
+    return {
+      picks,
+      totalCandidates: candidates.length,
+      used: true,
+      provider: p.name,
+    };
   }
+
+  // 所有 provider 都失败 → 返回 null，上层走规则 fallback，还是不 5xx
+  console.error(`[AI] ALL providers failed (tried: ${providers.map((p) => p.name).join(", ")}); returning null to fallback`);
+  return null;
 }
