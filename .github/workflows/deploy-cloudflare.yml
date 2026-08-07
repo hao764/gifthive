@@ -17,15 +17,12 @@ jobs:
 
       - name: Validate required secrets
         run: |
-          missing=()
-          [ -z "${{ secrets.CLOUDFLARE_API_TOKEN }}" ] && missing+=("CLOUDFLARE_API_TOKEN")
-          [ -z "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" ] && missing+=("CLOUDFLARE_ACCOUNT_ID")
-          if [ ${#missing[@]} -gt 0 ]; then
-            echo "::error::Missing required GitHub Secrets: ${missing[*]}"
-            echo "Please add them in https://github.com/${GITHUB_REPOSITORY}/settings/secrets/actions"
+          if [ -z "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]; then
+            echo "::error::Missing required GitHub Secret: CLOUDFLARE_API_TOKEN"
+            echo "Please add it in https://github.com/${GITHUB_REPOSITORY}/settings/secrets/actions"
             exit 1
           fi
-          echo "All required secrets are present."
+          echo "CLOUDFLARE_API_TOKEN is present."
 
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
@@ -55,4 +52,4 @@ jobs:
             --verbose
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_ACCOUNT_ID: 43a844e46a9646a8887ebb9672dd1a09
