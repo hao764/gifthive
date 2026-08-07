@@ -10,6 +10,8 @@ import {
   getTotalGiftsCountFallback,
 } from "@/lib/supabase";
 
+export const runtime = "edge";
+
 function formatGiftsFound(n: number): string {
   if (n >= 1000) return `${Math.floor(n / 1000)}k+`;
   if (n >= 100) return `${Math.floor(n / 10) * 10}+`;

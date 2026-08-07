@@ -6,6 +6,8 @@ import { useTranslations } from "next-intl";
 import QuizStep from "@/components/QuizStep";
 import { quizQuestions } from "@/lib/data";
 
+export const runtime = "edge";
+
 // Map quiz option values to translation keys
 const OPTION_LABEL_KEYS: Record<string, Record<string, string>> = {
   recipient: {
