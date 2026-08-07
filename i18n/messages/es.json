@@ -184,6 +184,8 @@
       "recipient": {
         "title": "¿Para quién es este regalo?",
         "subtitle": "Primero dinos para quién es — define todo lo que viene después.",
+        "customLabel": "O dime quién es",
+        "customPlaceholder": "ej: mi novio que acaba de ascender, mi suegro fanático de la pesca, mi mejor amiga desde la infancia",
         "him": "Él",
         "himDesc": "Pareja · Padre · Hermano",
         "her": "Ella",
@@ -200,6 +202,8 @@
       "occasion": {
         "title": "¿Cuál es la ocasión?",
         "subtitle": "La ocasión cambia lo que significa 'adecuado'.",
+        "customLabel": "O dime la ocasión",
+        "customPlaceholder": "ej: aniversario de 3 años juntos, los 60 de papá, casa nueva, una pequeña sorpresa para ella tras un viaje",
         "birthday": "Cumpleaños",
         "anniversary": "Aniversario",
         "holiday": "Vacaciones",
@@ -210,6 +214,8 @@
       "budget": {
         "title": "¿Cuál es tu presupuesto?",
         "subtitle": "Un rango está bien — encontraremos lo mejor dentro de él.",
+        "customLabel": "O marca tu presupuesto",
+        "customPlaceholder": "ej: menos de $50, entre $80–$150, lo que encaje, prefiero lo más acertado",
         "under30": "Menos de $30",
         "range30to75": "$30 – $75",
         "range75to150": "$75 – $150",
@@ -220,6 +226,8 @@
       "interests": {
         "title": "¿Qué les apasiona?",
         "subtitle": "Elige todas las que apliquen — cuantas más elijas, más preciso será.",
+        "customLabel": "O dime qué les apasiona",
+        "customPlaceholder": "ej: café de filtro todas las mañanas, acampa cada fin de semana, aprende pintura al óleo, ama cámaras vintage",
         "tech": "Tecnología",
         "coffee": "Café y Té",
         "outdoor": "Exteriores",
@@ -230,6 +238,8 @@
       "personality": {
         "title": "¿Su personalidad?",
         "subtitle": "Esto decide entre práctico o romántico.",
+        "customLabel": "O describe un poco su personalidad",
+        "customPlaceholder": "ej: callado pero lo recuerda todo, valora más lo hecho a mano que lo comprado, ama las pequeñas cosas raras",
         "practical": "Práctico",
         "practicalDesc": "Lee tres reseñas primero",
         "romantic": "Romántico",
@@ -242,6 +252,8 @@
       "closeness": {
         "title": "¿Qué tan cercano eres?",
         "subtitle": "La última — la cercanía define el peso del regalo.",
+        "customLabel": "O dime cómo es su relación",
+        "customPlaceholder": "ej: novia de 5 años, excompañero que me ayudó mucho, un profesor que casi no conozco pero al que debo agradecer",
         "partner": "Pareja",
         "family": "Familia",
         "closeFriend": "Amigo cercano",

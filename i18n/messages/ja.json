@@ -184,6 +184,8 @@
       "recipient": {
         "title": "このギフトは誰へのプレゼントですか？",
         "subtitle": "まずは誰に贈るか教えてください — その後の全てがこれで決まります",
+        "customLabel": "または相手について教えて",
+        "customPlaceholder": "例：昇進したばかりの彼氏、釣り好きの義父、子供の頃からの親友",
         "him": "彼",
         "himDesc": "パートナー · 父 · 兄弟",
         "her": "彼女",
@@ -200,6 +202,8 @@
       "occasion": {
         "title": "どんな場面ですか？",
         "subtitle": "場面によって「正しい」の意味が変わります",
+        "customLabel": "またはどんな日か教えて",
+        "customPlaceholder": "例：付き合って3年の記念日、父の還暦、引っ越し祝い、出張帰りの彼女への小さなサプライズ",
         "birthday": "誕生日",
         "anniversary": "記念日",
         "holiday": "祝日",
@@ -210,6 +214,8 @@
       "budget": {
         "title": "予算はどのくらいですか？",
         "subtitle": "価格帯で構いません — その中で最高のものを見つけます",
+        "customLabel": "または予算を直接教えて",
+        "customPlaceholder": "例：5,000円以下、1万〜2万円の間、こだわらないので一番合うものを",
         "under30": "$30以下",
         "range30to75": "$30 – $75",
         "range75to150": "$75 – $150",
@@ -220,6 +226,8 @@
       "interests": {
         "title": "何が好きですか？",
         "subtitle": "当てはまるものを全て選んでください — 選ぶほど鋭くなります",
+        "customLabel": "または好きなことを教えて",
+        "customPlaceholder": "例：毎朝ハンドドリップコーヒー、週末はキャンプ、油絵を習い始めた、ヴィンテージカメラが好き",
         "tech": "テック",
         "coffee": "コーヒー & お茶",
         "outdoor": "アウトドア",
@@ -230,6 +238,8 @@
       "personality": {
         "title": "性格は？",
         "subtitle": "実用的かロマンチックかがこれで決まります",
+        "customLabel": "または性格を少し教えて",
+        "customPlaceholder": "例：無口だけど何でも覚えてる、手作りのほうが嬉しい、変な小さなものが好き",
         "practical": "実用的",
         "practicalDesc": "まず3つのレビューを読む",
         "romantic": "ロマンチック",
@@ -242,6 +252,8 @@
       "closeness": {
         "title": "どのくらい親しいですか？",
         "subtitle": "最後の質問 — 親しさがギフトの重みを決めます",
+        "customLabel": "または関係性を教えて",
+        "customPlaceholder": "例：付き合って5年の彼女、色々助けてくれた前の同僚、あまり知らないけどお礼を言いたい教授",
         "partner": "パートナー",
         "family": "家族",
         "closeFriend": "親しい友人",

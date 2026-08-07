@@ -184,6 +184,8 @@
       "recipient": {
         "title": "这件礼物送给谁？",
         "subtitle": "先告诉我们送给谁 —— 这决定了后续的一切",
+        "customLabel": "或者告诉我是谁",
+        "customPlaceholder": "例如：刚升部门经理的男朋友、爱钓鱼的老丈人、从小一起长大的闺蜜",
         "him": "他",
         "himDesc": "伴侣 · 父亲 · 兄弟",
         "her": "她",
@@ -200,6 +202,8 @@
       "occasion": {
         "title": "什么场合？",
         "subtitle": "场合不同，\"合适\"的含义也不同",
+        "customLabel": "或者说是什么日子",
+        "customPlaceholder": "例如：在一起三周年纪念日、爸爸六十大寿、搬新家暖房、出差回来想给她个小惊喜",
         "birthday": "生日",
         "anniversary": "纪念日",
         "holiday": "节日",
@@ -210,6 +214,8 @@
       "budget": {
         "title": "你的预算是多少？",
         "subtitle": "一个范围就好 —— 我们会在其中找到最佳选择",
+        "customLabel": "或者直接说预算",
+        "customPlaceholder": "例如：不超过 500、600–1200 之间、不用考虑预算看最合适的",
         "under30": "$30 以下",
         "range30to75": "$30 – $75",
         "range75to150": "$75 – $150",
@@ -220,6 +226,8 @@
       "interests": {
         "title": "他们喜欢什么？",
         "subtitle": "选所有符合的 —— 选得越多，结果越精准",
+        "customLabel": "或者说他们喜欢什么",
+        "customPlaceholder": "例如：每天早上必喝手冲、一到周末就露营、最近在学油画、喜欢老物件和复古相机",
         "tech": "科技",
         "coffee": "咖啡与茶",
         "outdoor": "户外",
@@ -230,6 +238,8 @@
       "personality": {
         "title": "他们的性格？",
         "subtitle": "这决定了实用还是浪漫",
+        "customLabel": "或者描述一下他们",
+        "customPlaceholder": "例如：话少但什么都放在心里、收到小手工比买的礼物更开心、喜欢奇奇怪怪的小玩意儿",
         "practical": "实用型",
         "practicalDesc": "先看三篇评价再决定",
         "romantic": "浪漫型",
@@ -242,6 +252,8 @@
       "closeness": {
         "title": "你们有多亲近？",
         "subtitle": "最后一题 —— 亲近程度决定礼物的分量",
+        "customLabel": "或者说你们的关系",
+        "customPlaceholder": "例如：谈了 5 年的女朋友、帮过我大忙的前同事、不太熟但必须送的导师",
         "partner": "伴侣",
         "family": "家人",
         "closeFriend": "亲密朋友",

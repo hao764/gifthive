@@ -15,6 +15,10 @@ type Props = {
     next: string;
     seeResults: string;
   };
+  customText?: string;
+  onCustomTextChange?: (text: string) => void;
+  customLabel?: string;
+  customPlaceholder?: string;
 };
 
 export default function QuizStep({
@@ -26,10 +30,15 @@ export default function QuizStep({
   onNext,
   onBack,
   labels,
+  customText = "",
+  onCustomTextChange,
+  customLabel = "Or describe in your own words",
+  customPlaceholder = "Type here…",
 }: Props) {
   const progress = Math.round((current / total) * 100);
   const isLast = current === total;
-  const canProceed = Boolean(selected);
+  const hasCustom = customText.trim().length > 0;
+  const canProceed = Boolean(selected) || hasCustom;
 
   return (
     <div className="animate-fade-in mx-auto w-full max-w-3xl">
@@ -133,6 +142,48 @@ export default function QuizStep({
           );
         })}
       </div>
+
+      {/* ============ Custom input ============ */}
+      {onCustomTextChange && (
+        <div
+          className={`mt-3 overflow-hidden rounded-2xl border transition-all duration-500 ease-editorial ${
+            hasCustom
+              ? "border-ember bg-ember/[0.07] shadow-soft"
+              : "border-ink/10 bg-cream-paper hover:border-ink/30"
+          }`}
+        >
+          <div className="flex flex-col gap-2 p-5">
+            <label className="flex items-center gap-2.5">
+              <span
+                className={`flex h-5 w-5 flex-none items-center justify-center rounded-full border transition-all duration-500 ease-editorial ${
+                  hasCustom
+                    ? "border-ember bg-ember text-cream"
+                    : "border-ink/20 text-transparent"
+                }`}
+              >
+                <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
+              </span>
+              <span className={`font-display text-sm font-medium tracking-tight ${hasCustom ? "text-ember-deep" : "text-ink/50"}`}>
+                {customLabel}
+              </span>
+            </label>
+            <textarea
+              value={customText}
+              onChange={(e) => {
+                onCustomTextChange(e.target.value);
+                if (e.target.value.trim() && selected) {
+                  onSelect("");
+                }
+              }}
+              placeholder={customPlaceholder}
+              rows={2}
+              className="w-full resize-none rounded-xl border border-ink/10 bg-cream/50 px-4 py-3 text-sm leading-relaxed text-ink placeholder:text-ink/30 focus:border-ember focus:outline-none focus:ring-1 focus:ring-ember/30"
+            />
+          </div>
+        </div>
+      )}
 
       {/* ============ Actions ============ */}
       <div className="mt-10 flex items-center justify-between gap-4">

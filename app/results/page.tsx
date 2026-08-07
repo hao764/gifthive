@@ -57,6 +57,11 @@ export default async function ResultsPage({
       closeness: searchParams?.closeness,
     };
 
+    // Detect custom answers (user typed their own description instead of picking a preset)
+    const isCustom = (val?: string): boolean => val?.startsWith("custom:") ?? false;
+    const hasAnyCustom = isCustom(quizAnswers.recipient) || isCustom(quizAnswers.occasion)
+      || isCustom(quizAnswers.interests) || isCustom(quizAnswers.personality);
+
     const audienceSlug = RECIPIENT_MAP[quizAnswers.recipient || ""];
     const occasionSlug = OCCASION_MAP[quizAnswers.occasion || ""];
 
@@ -64,11 +69,13 @@ export default async function ResultsPage({
     let totalCandidates = 0;
 
     try {
-      // 1. Fetch 30 candidate products from Supabase
+      // 1. Fetch candidate products from Supabase
+      // If user typed custom text, fetch a broader pool (no audience/occasion filter)
+      // so the AI has more candidates to match against their custom description
       const { data: products } = await fetchProducts({
-        audience: audienceSlug as any,
-        occasion: occasionSlug,
-        limit: 30,
+        audience: hasAnyCustom ? undefined : (audienceSlug as any),
+        occasion: hasAnyCustom ? undefined : occasionSlug,
+        limit: 50,
       });
 
       if (products && products.length > 0) {

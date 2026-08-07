@@ -68,18 +68,37 @@ const CLOSENESS_MAP: Record<string, string> = {
 
 function formatQuizAnswers(answers: Record<string, string | undefined>): string {
   const lines: string[] = [];
-  if (answers.recipient)
-    lines.push(`- Gift recipient: ${RECIPIENT_MAP[answers.recipient] ?? answers.recipient}`);
-  if (answers.occasion)
-    lines.push(`- Occasion: ${OCCASION_MAP[answers.occasion] ?? answers.occasion}`);
-  if (answers.budget)
-    lines.push(`- Budget: ${BUDGET_MAP[answers.budget] ?? answers.budget}`);
-  if (answers.interests)
-    lines.push(`- Interests: ${INTERESTS_MAP[answers.interests] ?? answers.interests}`);
-  if (answers.personality)
-    lines.push(`- Personality: ${PERSONALITY_MAP[answers.personality] ?? answers.personality}`);
-  if (answers.closeness)
-    lines.push(`- Relationship closeness: ${CLOSENESS_MAP[answers.closeness] ?? answers.closeness}`);
+
+  // Helper: extract custom text if value starts with "custom:"
+  const getCustom = (val?: string): string | null => {
+    if (val && val.startsWith("custom:")) return val.slice(7);
+    return null;
+  };
+
+  if (answers.recipient) {
+    const custom = getCustom(answers.recipient);
+    lines.push(`- Gift recipient: ${custom ?? RECIPIENT_MAP[answers.recipient] ?? answers.recipient}`);
+  }
+  if (answers.occasion) {
+    const custom = getCustom(answers.occasion);
+    lines.push(`- Occasion: ${custom ?? OCCASION_MAP[answers.occasion] ?? answers.occasion}`);
+  }
+  if (answers.budget) {
+    const custom = getCustom(answers.budget);
+    lines.push(`- Budget: ${custom ?? BUDGET_MAP[answers.budget] ?? answers.budget}`);
+  }
+  if (answers.interests) {
+    const custom = getCustom(answers.interests);
+    lines.push(`- Interests: ${custom ?? INTERESTS_MAP[answers.interests] ?? answers.interests}`);
+  }
+  if (answers.personality) {
+    const custom = getCustom(answers.personality);
+    lines.push(`- Personality: ${custom ?? PERSONALITY_MAP[answers.personality] ?? answers.personality}`);
+  }
+  if (answers.closeness) {
+    const custom = getCustom(answers.closeness);
+    lines.push(`- Relationship closeness: ${custom ?? CLOSENESS_MAP[answers.closeness] ?? answers.closeness}`);
+  }
   return lines.join("\n");
 }
 
@@ -101,7 +120,7 @@ export async function getAIGiftRecommendations(
       category: g.category,
     }));
 
-    const systemPrompt = `You are an expert gift curator. Given a user's gift-giving profile and a catalog of real Amazon products, pick the 5 best-matching gifts. For each pick, write a personalized 1-2 sentence reason explaining WHY this specific gift fits THIS specific person. Be specific — reference their interests, personality, or relationship. Give a match score 0-100. Return ONLY valid JSON, no markdown.`;
+    const systemPrompt = `You are an expert gift curator. Given a user's gift-giving profile and a catalog of real Amazon products, pick the 5 best-matching gifts. The user may provide custom descriptions instead of preset categories — treat these as the most accurate expression of their intent and prioritize them. For each pick, write a personalized 1-2 sentence reason explaining WHY this specific gift fits THIS specific person. Be specific — reference their interests, personality, or relationship. Give a match score 0-100. Return ONLY valid JSON, no markdown.`;
 
     const userPrompt = `User's gift-giving profile:
 ${userProfile}

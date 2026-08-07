@@ -184,6 +184,8 @@
       "recipient": {
         "title": "Who is this gift for?",
         "subtitle": "Tell us who it's for first — it sets everything that comes after.",
+        "customLabel": "Or tell me who they are",
+        "customPlaceholder": "e.g. my boyfriend who just got promoted, my fishing-nut father-in-law, my best friend since childhood",
         "him": "Him",
         "himDesc": "Partner · Father · Brother",
         "her": "Her",
@@ -200,6 +202,8 @@
       "occasion": {
         "title": "What's the occasion?",
         "subtitle": "Occasion changes what 'right' even means.",
+        "customLabel": "Or tell me the occasion",
+        "customPlaceholder": "e.g. 3-year dating anniversary, dad's 60th, housewarming, a small surprise for her after a trip",
         "birthday": "Birthday",
         "anniversary": "Anniversary",
         "holiday": "Holiday",
@@ -210,6 +214,8 @@
       "budget": {
         "title": "What's your budget?",
         "subtitle": "A range is fine — we'll find the best within it.",
+        "customLabel": "Or name your budget",
+        "customPlaceholder": "e.g. under $50, between $80–$150, whatever fits, I just want the right one",
         "under30": "Under $30",
         "range30to75": "$30 – $75",
         "range75to150": "$75 – $150",
@@ -220,6 +226,8 @@
       "interests": {
         "title": "What do they love?",
         "subtitle": "Pick all that fit — the more you choose, the sharper it gets.",
+        "customLabel": "Or tell me what they love",
+        "customPlaceholder": "e.g. hand-pour coffee every morning, camps every weekend, learning oil painting, loves vintage cameras",
         "tech": "Tech",
         "coffee": "Coffee & Tea",
         "outdoor": "Outdoors",
@@ -230,6 +238,8 @@
       "personality": {
         "title": "Their personality?",
         "subtitle": "This decides practical versus romantic.",
+        "customLabel": "Or describe them a little",
+        "customPlaceholder": "e.g. quiet but remembers everything, values handmade gifts more than store-bought ones, loves weird little trinkets",
         "practical": "Practical",
         "practicalDesc": "Reads three reviews first",
         "romantic": "Romantic",
@@ -242,6 +252,8 @@
       "closeness": {
         "title": "How close are you?",
         "subtitle": "Last one — closeness sets the weight of the gift.",
+        "customLabel": "Or tell me your relationship",
+        "customPlaceholder": "e.g. girlfriend of 5 years, former coworker who helped me a lot, a professor I barely know but need to thank",
         "partner": "Partner",
         "family": "Family",
         "closeFriend": "Close friend",

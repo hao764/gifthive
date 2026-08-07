@@ -184,6 +184,8 @@
       "recipient": {
         "title": "Für wen ist dieses Geschenk?",
         "subtitle": "Sag uns zuerst, für wen es ist — das bestimmt alles, was danach kommt.",
+        "customLabel": "Oder sag mir, wer sie ist",
+        "customPlaceholder": "z.B. mein Freund, der gerade befördert wurde, mein angelfreundiger Schwiegervater, meine beste Freundin seit Kindertagen",
         "him": "Ihn",
         "himDesc": "Partner · Vater · Bruder",
         "her": "Sie",
@@ -200,6 +202,8 @@
       "occasion": {
         "title": "Was ist der Anlass?",
         "subtitle": "Der Anlass verändert, was „richtig“ überhaupt bedeutet.",
+        "customLabel": "Oder sag mir den Anlass",
+        "customPlaceholder": "z.B. 3-jähriges Jahrestag, Papas 60., Einweihungsparty, eine kleine Überraschung für sie nach einer Reise",
         "birthday": "Geburtstag",
         "anniversary": "Jubiläum",
         "holiday": "Feiertag",
@@ -210,6 +214,8 @@
       "budget": {
         "title": "Was ist dein Budget?",
         "subtitle": "Eine Spanne reicht — wir finden das Beste darin.",
+        "customLabel": "Oder nenn dein Budget",
+        "customPlaceholder": "z.B. unter 50 €, zwischen 80 und 150 €, was passt — mir ist das Richtige wichtiger",
         "under30": "Unter $30",
         "range30to75": "$30 – $75",
         "range75to150": "$75 – $150",
@@ -220,6 +226,8 @@
       "interests": {
         "title": "Was lieben sie?",
         "subtitle": "Wähl alle, die passen — je mehr du wählst, desto präziser wird es.",
+        "customLabel": "Oder sag mir, was sie lieben",
+        "customPlaceholder": "z.B. jeden Morgen Handkaffee, jede Woche campen, lernt gerade Ölmalerei, liebt alte Kameras",
         "tech": "Tech",
         "coffee": "Kaffee & Tee",
         "outdoor": "Outdoor",
@@ -230,6 +238,8 @@
       "personality": {
         "title": "Ihre Persönlichkeit?",
         "subtitle": "Das entscheidet zwischen praktisch und romantisch.",
+        "customLabel": "Oder beschreib sie kurz",
+        "customPlaceholder": "z.B. still, aber merkt sich alles, schätzt selbst Gemachtes mehr als Gekauftes, liebt seltsame Kleinigkeiten",
         "practical": "Praktisch",
         "practicalDesc": "Liest erst drei Bewertungen",
         "romantic": "Romantisch",
@@ -242,6 +252,8 @@
       "closeness": {
         "title": "Wie nahe steht ihr euch?",
         "subtitle": "Die letzte — die Nähe bestimmt das Gewicht des Geschenks.",
+        "customLabel": "Oder sag mir eure Beziehung",
+        "customPlaceholder": "z.B. Freundin seit 5 Jahren, ehemaliger Kollege, der mir viel geholfen hat, ein Professor, den ich kaum kenne aber danken möchte",
         "partner": "Partner",
         "family": "Familie",
         "closeFriend": "Enger Freund",

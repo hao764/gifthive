@@ -53,6 +53,7 @@ export default function QuizPage() {
   const total = quizQuestions.length;
   const [current, setCurrent] = useState(1); // starts at 1
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [customTexts, setCustomTexts] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
   const question = quizQuestions[current - 1];
@@ -79,6 +80,18 @@ export default function QuizPage() {
 
   const handleSelect = (value: string) => {
     setAnswers((prev) => ({ ...prev, [question.key]: value }));
+    // Selecting a preset clears the custom text
+    if (value) {
+      setCustomTexts((prev) => ({ ...prev, [question.key]: "" }));
+    }
+  };
+
+  const handleCustomTextChange = (text: string) => {
+    setCustomTexts((prev) => ({ ...prev, [question.key]: text }));
+    // Typing custom text clears preset selection (unless it's being cleared)
+    if (text.trim()) {
+      setAnswers((prev) => ({ ...prev, [question.key]: "" }));
+    }
   };
 
   const handleNext = () => {
@@ -86,10 +99,16 @@ export default function QuizPage() {
       setCurrent((c) => c + 1);
       return;
     }
-    // Last question — go to results
+    // Last question — merge custom texts into answers, then go to results
     setLoading(true);
+    const finalAnswers: Record<string, string> = { ...answers };
+    for (const [key, text] of Object.entries(customTexts)) {
+      if (text.trim()) {
+        finalAnswers[key] = `custom:${text.trim()}`;
+      }
+    }
     const query = new URLSearchParams(
-      Object.fromEntries(Object.entries(answers))
+      Object.fromEntries(Object.entries(finalAnswers))
     ).toString();
     router.push(`/results?${query}`);
   };
@@ -164,11 +183,15 @@ export default function QuizPage() {
               next: t("next"),
               seeResults: t("seeResults"),
             }}
+            customText={customTexts[question.key] || ""}
+            onCustomTextChange={handleCustomTextChange}
+            customLabel={t(`questions.${qKey}.customLabel`)}
+            customPlaceholder={t(`questions.${qKey}.customPlaceholder`)}
           />
         )}
 
         {/* ============ Answered so far ============ */}
-        {!loading && Object.keys(answers).length > 0 && (
+        {!loading && (Object.keys(answers).length > 0 || Object.values(customTexts).some(v => v.trim())) && (
           <div className="mx-auto mt-16 max-w-3xl">
             <p className="mb-3 flex items-center gap-2 text-[0.62rem] font-semibold uppercase tracking-widest text-ink/40">
               <span className="h-px w-6 bg-ink/20" />
@@ -176,15 +199,24 @@ export default function QuizPage() {
             </p>
             <div className="flex flex-wrap gap-2">
               {quizQuestions
-                .filter((q) => answers[q.key])
+                .filter((q) => {
+                  const ct = (customTexts[q.key] || "").trim();
+                  return answers[q.key] || ct;
+                })
                 .map((q) => {
-                  const opt = q.options.find((o) => o.value === answers[q.key]);
-                  const qk = q.key as keyof typeof OPTION_LABEL_KEYS;
-                  const lm = OPTION_LABEL_KEYS[qk];
-                  const labelKey = lm?.[answers[q.key]];
-                  const translatedLabel = labelKey
-                    ? t(`questions.${qk}.${labelKey}`)
-                    : opt?.label || "";
+                  const ct = (customTexts[q.key] || "").trim();
+                  let displayLabel = "";
+                  if (ct) {
+                    displayLabel = ct.length > 40 ? ct.slice(0, 40) + "…" : ct;
+                  } else {
+                    const opt = q.options.find((o) => o.value === answers[q.key]);
+                    const qk = q.key as keyof typeof OPTION_LABEL_KEYS;
+                    const lm = OPTION_LABEL_KEYS[qk];
+                    const labelKey = lm?.[answers[q.key]];
+                    displayLabel = labelKey
+                      ? t(`questions.${qk}.${labelKey}`)
+                      : opt?.label || "";
+                  }
                   return (
                     <span
                       key={q.key}
@@ -193,7 +225,7 @@ export default function QuizPage() {
                       <span className="font-display italic text-ink/35">
                         {String(q.id).padStart(2, "0")}
                       </span>
-                      {translatedLabel}
+                      {displayLabel}
                     </span>
                   );
                 })}
