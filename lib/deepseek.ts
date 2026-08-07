@@ -112,59 +112,84 @@ ${JSON.stringify(productCatalog, null, 2)}
 Return ONLY this JSON format:
 {"picks":[{"product_id":"<id>","reason":"<1-2 sentence personalized reason>","match_score":<0-100>}]}`;
 
-    const response = await fetch(DEEPSEEK_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "deepseek-chat",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        temperature: 0.7,
-        max_tokens: 1200,
-        response_format: { type: "json_object" },
-      }),
-      signal: AbortSignal.timeout(8000),
-    });
-
-    if (!response.ok) {
-      console.error("DeepSeek API error:", response.status);
-      return null;
-    }
-
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content;
-    if (!content) return null;
-
-    const parsed = JSON.parse(content);
-    if (!parsed.picks || !Array.isArray(parsed.picks)) return null;
-
-    const picks: AIGift[] = [];
-    for (const pick of parsed.picks.slice(0, 5)) {
-      const gift = candidates.find((g) => g.id === pick.product_id);
-      if (gift) {
-        picks.push({
-          ...gift,
-          reason: pick.reason || gift.reason,
-          match: typeof pick.match_score === "number" ? pick.match_score : 0,
-          aiReason: pick.reason || "",
-          aiMatchScore: typeof pick.match_score === "number" ? pick.match_score : 0,
-        });
+    // ----- 关键修复：Edge Runtime 兼容的超时控制 -----
+    // 部分 Cloudflare / Vercel Edge Runtime 不支持 AbortSignal.timeout()，
+    // 直接用会抛 TypeError → 导致整页 5xx。这里手写 controller + setTimeout。
+    let timeoutTimer: ReturnType<typeof setTimeout> | undefined;
+    let controller: AbortController | undefined;
+    try {
+      if (typeof AbortController !== "undefined") {
+        controller = new AbortController();
+        const ms = 8000;
+        timeoutTimer = setTimeout(() => {
+          try { controller?.abort(); } catch (_) { /* noop */ }
+        }, ms);
       }
+    } catch (_) {
+      controller = undefined;
+      timeoutTimer = undefined;
     }
 
-    if (picks.length === 0) return null;
+    try {
+      const response = await fetch(DEEPSEEK_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: "deepseek-chat",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+          temperature: 0.7,
+          max_tokens: 1200,
+          response_format: { type: "json_object" },
+        }),
+        signal: controller?.signal,
+      });
 
-    return {
-      picks,
-      totalCandidates: candidates.length,
-      used: true,
-    };
+      if (!response.ok) {
+        // 把 HTTP 错误静默吞掉，上层走 fallback
+        console.error("DeepSeek API error:", response.status);
+        return null;
+      }
+
+      const data = await response.json();
+      const content = data.choices?.[0]?.message?.content;
+      if (!content) return null;
+
+      const parsed = JSON.parse(content);
+      if (!parsed.picks || !Array.isArray(parsed.picks)) return null;
+
+      const picks: AIGift[] = [];
+      for (const pick of parsed.picks.slice(0, 5)) {
+        const gift = candidates.find((g) => g.id === pick.product_id);
+        if (gift) {
+          picks.push({
+            ...gift,
+            reason: pick.reason || gift.reason,
+            match: typeof pick.match_score === "number" ? pick.match_score : 0,
+            aiReason: pick.reason || "",
+            aiMatchScore: typeof pick.match_score === "number" ? pick.match_score : 0,
+          });
+        }
+      }
+
+      if (picks.length === 0) return null;
+
+      return {
+        picks,
+        totalCandidates: candidates.length,
+        used: true,
+      };
+    } finally {
+      if (timeoutTimer) clearTimeout(timeoutTimer);
+    }
   } catch (err) {
+    // 任何异常（包括网络、超时、解析、AbortError）
+    // 一律返回 null，让上层走 fallback，绝不抛 5xx
     console.error("DeepSeek API call failed:", err);
     return null;
   }

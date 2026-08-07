@@ -23,6 +23,9 @@ export const revalidate = 86400;
 // Cloudflare Pages 需要 Edge Runtime
 export const runtime = "edge";
 
+// Amazon ASIN 格式：10 位大写字母或数字
+const ASIN_RE = /^[A-Z0-9]{10}$/;
+
 export async function generateStaticParams() {
   // 通过 REST API 直接拿所有 ASIN，避免在 build 时依赖 Supabase JS 客户端的运行时
   try {
@@ -36,7 +39,9 @@ export async function generateStaticParams() {
     });
     if (!res.ok) return [];
     const rows: { asin: string }[] = await res.json();
-    return rows.map((r) => ({ asin: r.asin }));
+    return rows
+      .filter((r) => r.asin && ASIN_RE.test(r.asin))
+      .map((r) => ({ asin: r.asin }));
   } catch {
     return [];
   }
@@ -48,6 +53,8 @@ export async function generateMetadata({
   params: Promise<{ asin: string }>;
 }): Promise<Metadata> {
   const { asin } = await params;
+  // ASIN 格式不合法 → 直接返回 404 标题，不打到 DB
+  if (!ASIN_RE.test(asin)) return { title: "Gift not found — GiftHive" };
   const product = await getProductByAsin(asin);
   if (!product) return { title: "Gift not found — GiftHive" };
   return {
@@ -67,14 +74,34 @@ export default async function GiftDetailPage({
   params: Promise<{ asin: string }>;
 }) {
   const { asin } = await params;
-  const product = await getProductByAsin(asin);
+
+  // 0. ASIN 格式校验：不是 10 位大写字母数字 → 直接 404（避免无效查询 + 减少 5xx 概率）
+  if (!ASIN_RE.test(asin)) {
+    notFound();
+  }
+
+  let product = null;
+  try {
+    product = await getProductByAsin(asin);
+  } catch (err) {
+    console.error("GiftDetailPage getProductByAsin threw:", err);
+    product = null;
+  }
   if (!product) {
     notFound();
   }
 
   const gift = productToGift(product);
-  const related = await getRelatedProducts(product, 4);
-  const relatedGifts: Gift[] = related.map(productToGift);
+
+  // 相关推荐是锦上添花：异常直接吞，返回空数组，不影响详情页渲染
+  let related: any[] = [];
+  try {
+    related = await getRelatedProducts(product, 4);
+  } catch (err) {
+    console.error("GiftDetailPage getRelatedProducts threw:", err);
+    related = [];
+  }
+  const relatedGifts: Gift[] = (related || []).map(productToGift);
 
   // 人群标签 → 人类可读
   const audienceLabel = (a?: string) => {
