@@ -3,7 +3,7 @@ import type { Product } from "./supabase";
 import { fixImageUrl } from "./images";
 
 // 亚马逊联盟 ID 占位符 —— 拿到真实 ID 后改这一处即可
-export const AFFILIATE_TAG = "GIFTHIVE-20";
+export const AFFILIATE_TAG = "gifthive08-20";
 
 // ---------- Unsplash image helper ----------
 const U = "https://images.unsplash.com/";
