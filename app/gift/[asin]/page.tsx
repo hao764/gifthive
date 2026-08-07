@@ -221,7 +221,20 @@ export default async function GiftDetailPage({
                     </p>
                   </div>
                   <a
-                    href={product.affiliate_url}
+                    href={
+                      product.affiliate_url
+                        ? /[?&]tag=/i.test(product.affiliate_url)
+                          ? product.affiliate_url.replace(
+                              /([?&])tag=[^&]*/i,
+                              `$1tag=${AFFILIATE_TAG}`
+                            )
+                          : `${product.affiliate_url}${
+                              product.affiliate_url.includes("?") ? "&" : "?"
+                            }tag=${AFFILIATE_TAG}`
+                        : `https://www.amazon.com/s?k=${encodeURIComponent(
+                            product.name || ""
+                          )}&tag=${AFFILIATE_TAG}`
+                    }
                     target="_blank"
                     rel="sponsored nofollow noopener noreferrer"
                     className="group inline-flex items-center gap-2 rounded-full bg-ink px-7 py-4 text-sm font-medium text-cream transition-all duration-500 ease-editorial hover:bg-ember"
