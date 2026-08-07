@@ -4,23 +4,48 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 // 惰性初始化 —— 环境变量缺失时不会崩溃，查询时返回 null
-let _client: SupabaseClient | null = null;
+let _client: SupabaseClient | null | undefined = undefined;
 
-function getClient(): SupabaseClient | null {
+export function getClient(): SupabaseClient | null {
+  if (_client !== undefined) return _client;
   if (!supabaseUrl || !supabaseAnonKey) {
+    _client = null;
     return null;
   }
-  if (!_client) {
+  try {
     _client = createClient(supabaseUrl, supabaseAnonKey);
+  } catch (err) {
+    console.error("Failed to create Supabase client:", err);
+    _client = null;
   }
   return _client;
 }
 
 // 兼容旧代码的导出 —— 通过 getter 访问
-export const supabase = new Proxy({} as SupabaseClient, {
+// 关键修复：当 client 不可用时返回一个安全的 dummy 对象，避免 .from(...) 直接崩溃
+const DUMMY: any = new Proxy(
+  {},
+  {
+    get() {
+      return new Proxy(
+        {},
+        {
+          get() {
+            return () => ({ data: null, error: { message: "Supabase not configured" } });
+          },
+          apply() {
+            return { data: null, error: { message: "Supabase not configured" } };
+          },
+        }
+      );
+    },
+  }
+);
+
+export const supabase: SupabaseClient = new Proxy({} as SupabaseClient, {
   get(_target, prop) {
     const client = getClient();
-    if (!client) return undefined;
+    if (!client) return DUMMY[prop];
     // @ts-expect-error — proxy 透传
     return client[prop];
   },

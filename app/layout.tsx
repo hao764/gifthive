@@ -26,7 +26,11 @@ export const metadata: Metadata = {
   description:
     "GiftHive helps you find a gift for someone who matters. Answer six questions, get five picks chosen by people who actually held them.",
   keywords: ["gift ideas", "gift finder", "gift guide", "GiftHive"],
-  icons: { icon: "/icon.svg" },
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({

@@ -15,6 +15,12 @@ type Props = {
   locked?: boolean;
 };
 
+const IMG_FALLBACK =
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect width="100%" height="100%" fill="#f0ebe3"/><circle cx="400" cy="270" r="50" fill="#d4cec3"/><rect x="320" y="340" width="160" height="10" rx="5" fill="#d4cec3"/></svg>'
+  );
+
 export default function GiftCard({
   gift,
   index,
@@ -24,6 +30,13 @@ export default function GiftCard({
 }: Props) {
   const indexStr =
     typeof index === "number" ? String(index).padStart(2, "0") : null;
+
+  const handleImgError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    if (img.src !== IMG_FALLBACK) {
+      img.src = IMG_FALLBACK;
+    }
+  };
 
   // IDE 预览面板是 iframe、sandbox 禁弹窗时 target="_blank" 会被静默忽略。
   // 这里手动处理：先尝试 window.open，失败回退到当前页跳转，保证按钮一定有反应。
@@ -49,12 +62,13 @@ export default function GiftCard({
       <article className="group relative flex flex-col overflow-hidden rounded-[1.75rem] border border-ink/8 bg-cream-paper shadow-soft">
         <div className="relative overflow-hidden bg-cream-deep">
           <div className="relative aspect-[4/3] w-full">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={gift.image}
               alt=""
               aria-hidden
               loading="lazy"
+              onError={handleImgError}
               className="h-full w-full scale-105 object-cover blur-xl brightness-75 saturate-50"
             />
             <div className="absolute inset-0 bg-ink/45" />
@@ -132,6 +146,7 @@ export default function GiftCard({
             src={gift.image}
             alt={gift.name}
             loading="lazy"
+            onError={handleImgError}
             className="h-full w-full object-cover transition-transform duration-[1100ms] ease-editorial group-hover:scale-[1.06]"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-ink/55 via-ink/0 to-ink/0 opacity-80 transition-opacity duration-700 group-hover:opacity-100" />
