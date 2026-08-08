@@ -219,7 +219,7 @@ export default async function SeoLandingPage({
                 { href: "#why-hard", label: land.whyHard.h2 },
                 { href: "#how-we-picked", label: "How we picked these gifts" },
                 { href: "#picks", label: `The ${gifts.length} best gifts` },
-                { href: "#cta", label: "Take the 6-question Gift Finder" },
+                { href: "#cta", label: "Take the 8-question Gift Finder" },
                 { href: "#faq", label: `Frequently asked questions (${land.faq.length})` },
               ].map((item) => (
                 <li key={item.href}>

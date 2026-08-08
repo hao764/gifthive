@@ -33,7 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
     "GiftHive — Gift Finder & Gift Ideas for Everyone You Love";
   const description =
     "Find thoughtful, hand-picked gift ideas for him, her, parents, kids, friends & coworkers. " +
-    "Take the 6-question Gift Finder quiz and get personalized gift recommendations chosen by people who actually held them.";
+    "Take the 8-question Gift Finder quiz and get 5 personalized gift recommendations chosen from the full catalog by AI.";
   const keywords = [
     "gift ideas",
     "gift finder",
