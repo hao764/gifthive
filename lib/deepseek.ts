@@ -21,7 +21,7 @@ import type { Gift } from "./data";
  * 新增/替换 provider 只需要在 PROVIDER_SPECS 里加一条就行。
  * ========================================================================= */
 
-type ProviderName = "DEEPSEEK" | "SILICONFLOW" | "DASHSCOPE" | "OPENROUTER" | "TOGETHER" | "OPENAI";
+type ProviderName = "DEEPSEEK" | "GROQ" | "SILICONFLOW" | "DASHSCOPE" | "OPENROUTER" | "TOGETHER" | "OPENAI";
 
 type ProviderSpec = {
   name: ProviderName;
@@ -52,6 +52,17 @@ const PROVIDER_SPECS: ProviderSpec[] = [
     apiKeyEnv: "DEEPSEEK_API_KEY",
     baseURL: "https://api.deepseek.com/v1/chat/completions",
     defaultModel: process.env.DEEPSEEK_MODEL || "deepseek-chat",
+  },
+  /* ————— Groq 海外备线（重点！Cloudflare Pages 海外节点 → 美国 Groq LPU 机房延迟很低）—————
+     · 免费额度：14,400 请求 / 天（约 600 次/小时），30 请求 / 分钟，永久免费每天重置
+     · 不用绑卡，邮箱就能注册 https://console.groq.com/
+     · 模型默认 Llama 3.3 70B，推理质量 ≈ GPT-4 下游任务，做 gift 推荐完全够
+  */
+  {
+    name: "GROQ",
+    apiKeyEnv: "GROQ_API_KEY",
+    baseURL: "https://api.groq.com/openai/v1/chat/completions",
+    defaultModel: process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
   },
   {
     name: "SILICONFLOW",
