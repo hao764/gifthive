@@ -21,7 +21,7 @@ import type { Gift } from "./data";
  * 新增/替换 provider 只需要在 PROVIDER_SPECS 里加一条就行。
  * ========================================================================= */
 
-type ProviderName = "DEEPSEEK" | "OPENROUTER" | "TOGETHER" | "OPENAI";
+type ProviderName = "DEEPSEEK" | "SILICONFLOW" | "DASHSCOPE" | "OPENROUTER" | "TOGETHER" | "OPENAI";
 
 type ProviderSpec = {
   name: ProviderName;
@@ -52,6 +52,18 @@ const PROVIDER_SPECS: ProviderSpec[] = [
     apiKeyEnv: "DEEPSEEK_API_KEY",
     baseURL: "https://api.deepseek.com/v1/chat/completions",
     defaultModel: process.env.DEEPSEEK_MODEL || "deepseek-chat",
+  },
+  {
+    name: "SILICONFLOW",
+    apiKeyEnv: "SILICONFLOW_API_KEY",
+    baseURL: "https://api.siliconflow.cn/v1/chat/completions",
+    defaultModel: process.env.SILICONFLOW_MODEL || "deepseek-ai/DeepSeek-V3",
+  },
+  {
+    name: "DASHSCOPE",
+    apiKeyEnv: "DASHSCOPE_API_KEY",
+    baseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+    defaultModel: process.env.DASHSCOPE_MODEL || "qwen-plus",
   },
   {
     name: "OPENROUTER",
