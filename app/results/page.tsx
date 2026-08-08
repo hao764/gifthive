@@ -3,6 +3,7 @@ import { fetchProducts, getRecommendedGiftsFallback } from "@/lib/supabase";
 import { getAIGiftRecommendations, type AIGift } from "@/lib/deepseek";
 import { productToGift } from "@/lib/data";
 import { getTranslations } from "next-intl/server";
+import { headers as nextHeaders } from "next/headers";
 import type { Metadata } from "next";
 
 export const runtime = "edge";
@@ -48,6 +49,25 @@ export default async function ResultsPage({
 }) {
   // 整个页面逻辑包一个大 try/catch → 任何意外都走 fallback，绝不抛 5xx
   try {
+    // ————— Geo 智能路由：取 Cloudflare 注入的国家码 —————
+    // Cloudflare Pages Edge Runtime 自动填：
+    //   cf-ipcountry         ：2 位 ISO country code（推荐）
+    //   x-geoip-country      ：备用，某些平台填的这个
+    // 拿不到就传 undefined，内部保持默认顺序（先 DeepSeek 再 Groq 降级）
+    let geoHint: string | undefined;
+    try {
+      const hdrs = nextHeaders();
+      geoHint =
+        hdrs.get("cf-ipcountry") ||
+        hdrs.get("x-geoip-country") ||
+        undefined;
+      if (geoHint) geoHint = geoHint.trim().toUpperCase();
+      // Cloudflare 某些异常场景用 XX / T1（Tor 等）当作未知，传空
+      if (geoHint === "XX" || geoHint === "T1") geoHint = undefined;
+    } catch (_) {
+      // headers() 在非常罕见的环境会抛（比如本地 next dev 没有 Edge context），吞掉即可
+    }
+
     const quizAnswers: Record<string, string | undefined> = {
       recipient: searchParams?.recipient,
       occasion: searchParams?.occasion,
@@ -85,7 +105,7 @@ export default async function ResultsPage({
         // 2. Try AI recommendation
         let aiResult = null;
         try {
-          aiResult = await getAIGiftRecommendations(quizAnswers, mapped);
+          aiResult = await getAIGiftRecommendations(quizAnswers, mapped, { geoHint });
         } catch (aiErr) {
           console.error("AI recommendation threw (caught):", aiErr);
           aiResult = null;

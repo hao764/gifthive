@@ -111,6 +111,67 @@ function getEnabledProviders(): ProviderSpec[] {
   return out;
 }
 
+/**
+ * 根据请求来源国家/地区重排 provider 调用顺序，把最近机房的 provider 放前面，
+ * 从根源上避免「海外节点调国内 API 超时」的尴尬 —— 先试成功率最高的。
+ *
+ * 映射关系：
+ *   - 中国大陆 (CN)、香港 (HK)、澳门 (MO)、台湾 (TW)、新加坡 (SG)、
+ *     马来西亚 (MY)、泰国 (TH)、越南 (VN)、印尼 (ID)、菲律宾 (PH)、
+ *     日本 (JP)、韩国 (KR) → 先国内/亚太机房 provider：
+ *     DEEPSEEK → SILICONFLOW → DASHSCOPE → GROQ → OPENROUTER → TOGETHER → OPENAI
+ *   - 其他所有国家/地区（北美、欧洲、拉美、非洲、中东、大洋洲等）→ 先海外机房 provider：
+ *     GROQ → TOGETHER → OPENROUTER → OPENAI → DEEPSEEK → SILICONFLOW → DASHSCOPE
+ *   - geoHint 为空（没法判断）→ 保持原始顺序：DEEPSEEK → GROQ → SILICONFLOW → ...
+ *
+ * 调完「第一个机房组」所有 provider 都失败时，才会切去另一个机房组兜底，
+ * 因此「CN 用户 → 国内 API 失败」的概率被压到非常低；反之海外用户 Groq 秒响应。
+ */
+function reorderByGeo(specs: ProviderSpec[], geoHint: string | undefined): ProviderSpec[] {
+  if (specs.length === 0) return specs;
+  const g = (geoHint || "").trim().toUpperCase();
+  if (!g) return specs;
+
+  const CN_GROUP: ProviderName[] = [
+    "DEEPSEEK",
+    "SILICONFLOW",
+    "DASHSCOPE",
+  ];
+  const OVERSEAS_GROUP: ProviderName[] = [
+    "GROQ",
+    "TOGETHER",
+    "OPENROUTER",
+    "OPENAI",
+  ];
+
+  // 亚太/华语区优先 CN_GROUP
+  const APAC_GEOS = new Set([
+    "CN", "HK", "MO", "TW",
+    "SG", "MY", "TH", "VN", "ID", "PH",
+    "JP", "KR", "IN", "BD", "PK", "LK",
+  ]);
+
+  const firstGroup = APAC_GEOS.has(g) ? CN_GROUP : OVERSEAS_GROUP;
+  const secondGroup = APAC_GEOS.has(g) ? OVERSEAS_GROUP : CN_GROUP;
+
+  // 按 firstGroup 的顺序排，找不到 name 的放最后（理论上不会出现）
+  const byName = new Map(specs.map((s) => [s.name, s]));
+  const result: ProviderSpec[] = [];
+  for (const n of firstGroup) {
+    const p = byName.get(n);
+    if (p) result.push(p);
+  }
+  for (const n of secondGroup) {
+    const p = byName.get(n);
+    if (p) result.push(p);
+  }
+  // 兜底：如果 future 新加入某个 provider 没进上面两组，按原始顺序塞进队尾
+  for (const s of specs) {
+    if (!result.find((r) => r.name === s.name)) result.push(s);
+  }
+  return result;
+}
+
 export type AIGift = Gift & {
   aiReason?: string;
   aiMatchScore?: number;
@@ -125,6 +186,8 @@ export type AIResult = {
   used: boolean;
   /** 这次实际上是哪一个 provider 出的结果（方便日志定位） */
   provider?: ProviderName;
+  /** 路由判定用的 Geo country code，用于验证 geo 路由确实生效 */
+  geoHint?: string;
 };
 
 /* -------------------- 题目答案 → 英文 User Profile -------------------- */
@@ -348,16 +411,22 @@ async function callOneProvider(
 /* -------------------- 导出的主函数 -------------------- */
 export async function getAIGiftRecommendations(
   quizAnswers: Record<string, string | undefined>,
-  candidates: Gift[]
+  candidates: Gift[],
+  opts?: { geoHint?: string }
 ): Promise<AIResult | null> {
   if (!candidates || candidates.length === 0) return null;
 
-  const providers = getEnabledProviders();
+  let providers = getEnabledProviders();
   if (providers.length === 0) {
     // 没有任何一个 provider 的 key 配置 → 直接跳过，安静返回 null
     // （本地 / 刚部署忘加 secret 的常态，绝不能 5xx）
     return null;
   }
+
+  // Geo 智能路由：CN/亚太用户先打国内 API，海外用户先打美国/欧洲机房 API
+  // 这样 Cloudflare Pages 海外 POP 不会去撞 api.deepseek.com 的跨境高延迟
+  const geoHint = opts?.geoHint;
+  providers = reorderByGeo(providers, geoHint);
 
   const userProfile = formatQuizAnswers(quizAnswers);
   const productCatalog = candidates.map((g) => ({
@@ -429,13 +498,14 @@ export async function getAIGiftRecommendations(
 
     // 成功路径
     console.log(
-      `[AI] ${p.name} OK — ${picks.length} picks from ${candidates.length} candidates in ≤${ms}ms`
+      `[AI] ${p.name} OK (geo=${geoHint || "unknown"}) — ${picks.length} picks from ${candidates.length} candidates in ≤${ms}ms`
     );
     return {
       picks,
       totalCandidates: candidates.length,
       used: true,
       provider: p.name,
+      geoHint: geoHint || undefined,
     };
   }
 
