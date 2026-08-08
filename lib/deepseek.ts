@@ -484,13 +484,12 @@ export async function getAIGiftRecommendations(
   providers = reorderByGeo(providers, geoHint);
 
   const userProfile = formatQuizAnswers(quizAnswers);
-  const productCatalog = candidates.map((g) => ({
-    id: g.id,
-    name: g.name,
-    price: g.price,
-    description: g.tagline || g.name,
-    category: g.category,
-  }));
+
+  // ————— AI 输入极致精简：只传 id|price|tags，不传 name/description/category 长文本 —————
+  // 行业标准格式：每件商品一行，token 消耗从 ~3000 降到 ~300
+  const productCatalog = candidates.map((g) =>
+    `${g.id}|${g.price}|${g.category}|${g.tags.join(",")}`
+  ).join("\n");
 
   const systemPrompt = [
     "你是专业礼品推荐师，严格根据提供的商品列表和用户需求筛选礼物。",
@@ -501,13 +500,15 @@ export async function getAIGiftRecommendations(
     "3. 严格遵守用户预算，不得推荐超出预算的商品",
     "4. 只返回JSON格式，不要多余解释",
     "",
+    "商品列表格式：每行一件，格式为 id|price|category|tags",
+    "",
     "Return ONLY valid JSON matching this shape (no markdown, no preamble, no explanation outside JSON):",
-    '{"picks":[{"product_id":"<catalog.id>","reason":"<1 sentence in the user\'s language>","match_score":<0-100 integer>}]}',
+    '{"picks":[{"product_id":"<id>","reason":"<1 sentence in the user\'s language>","match_score":<0-100 integer>}]}',
   ].join("\n");
 
   const userPrompt = [
     "【商品列表】",
-    JSON.stringify(productCatalog, null, 2),
+    productCatalog,
     "",
     "【用户需求】",
     userProfile,
