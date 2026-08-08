@@ -92,23 +92,39 @@ export default async function ResultsPage({
     let candidates: AIGift[] = [];
     let totalCandidates = 0;
 
+    // ————— 预算 → DB 层 price_range 映射 —————
+    // Supabase 的 price_range 字段：cheap / mid / high
+    // 在数据库查询时就过滤掉不匹配的，减少网络传输量
+    const BUDGET_TO_PRICE_RANGE: Record<string, "cheap" | "mid" | "high"> = {
+      "0-30": "cheap",
+      "30-75": "cheap",
+      "75-150": "mid",
+      "150-400": "high",
+      "400+": "high",
+    };
+    const budgetVal = quizAnswers.budget;
+    const isBudgetCustom = budgetVal?.startsWith("custom:");
+    const dbPriceRange = budgetVal && !isBudgetCustom
+      ? BUDGET_TO_PRICE_RANGE[budgetVal]
+      : budgetVal === "flexible"
+        ? undefined
+        : undefined;
+
     try {
-      // 1. Fetch candidate products from Supabase
-      // 拉取更大的候选池（200件），然后做本地预算预过滤，只把少量高匹配候选传给 AI
-      // 这样大幅降低 AI 调用成本（token 数），同时保证推荐质量
+      // 1. Fetch candidate products from Supabase（DB 层过滤：audience + occasion + price_range）
       const { data: products } = await fetchProducts({
         audience: hasAnyCustom ? undefined : (audienceSlug as any),
         occasion: hasAnyCustom ? undefined : occasionSlug,
+        priceRange: dbPriceRange,
         limit: 200,
       });
 
       if (products && products.length > 0) {
         let mapped = products.map(productToGift) as AIGift[];
 
-        // ————— 基础条件预过滤：预算 —————
-        // 严格按用户选的预算区间过滤，超预算的直接剔除，不传给 AI
-        const budgetVal = quizAnswers.budget;
-        if (budgetVal && !budgetVal.startsWith("custom:")) {
+        // ————— 代码层精确预算过滤 —————
+        // DB 层 price_range 是粗分类（cheap/mid/high），这里做精确价格区间过滤
+        if (budgetVal && !isBudgetCustom && budgetVal !== "flexible") {
           mapped = mapped.filter((g) => {
             const p = g.price;
             switch (budgetVal) {
@@ -117,13 +133,65 @@ export default async function ResultsPage({
               case "75-150": return p >= 75 && p < 150;
               case "150-400": return p >= 150 && p <= 400;
               case "400+": return p > 400;
-              case "flexible": return true; // 不过滤
               default: return true;
             }
           });
         }
 
+        // ————— 代码层：兴趣标签匹配 —————
+        // 用户选了 interests（tech/coffee/outdoor/reading/cooking/music）
+        // 只保留 tags 至少匹配一个兴趣的商品；如果匹配数太少（<5）则放弃过滤
+        const interestVal = quizAnswers.interests;
+        if (interestVal && !interestVal.startsWith("custom:")) {
+          // 兴趣关键词 → 商品 tags 里可能出现的匹配词
+          const INTEREST_KEYWORDS: Record<string, string[]> = {
+            tech: ["tech", "electronics", "gadget", "desk", "productivity"],
+            coffee: ["coffee", "tea", "mug", "drink", "morning"],
+            outdoor: ["outdoor", "camp", "sports", "active", "adventure"],
+            reading: ["reading", "book", "notebook", "stationery"],
+            cooking: ["cooking", "kitchen", "food", "pantry"],
+            music: ["music", "vinyl", "audio", "record"],
+          };
+          const keywords = INTEREST_KEYWORDS[interestVal];
+          if (keywords) {
+            const filtered = mapped.filter((g) =>
+              g.tags.some((tag) =>
+                keywords.some((kw) => tag.toLowerCase().includes(kw))
+              )
+            );
+            // 只在过滤后还有足够候选时才应用，否则保留全部让 AI 来选
+            if (filtered.length >= 5) {
+              mapped = filtered;
+            }
+          }
+        }
+
+        // ————— 代码层：礼物风格匹配 —————
+        // 用户选了 giftStyle，按 category 做偏好过滤
+        // 匹配数太少（<5）则放弃，保留全部让 AI 判断
+        const styleVal = quizAnswers.giftStyle;
+        if (styleVal && !styleVal.startsWith("custom:")) {
+          const STYLE_CATEGORIES: Record<string, string[]> = {
+            "practical-item": ["Daily", "Home", "Wear", "Stationery", "Desk"],
+            "experience": ["Experience", "Outdoor", "Games"],
+            "creative": ["Games", "Art", "Toys", "Crafts"],
+            "classic": [], // classic = 不过滤，全部保留
+          };
+          const preferredCats = STYLE_CATEGORIES[styleVal];
+          if (preferredCats && preferredCats.length > 0) {
+            const filtered = mapped.filter((g) =>
+              preferredCats.some((cat) =>
+                g.category.toLowerCase().includes(cat.toLowerCase())
+              )
+            );
+            if (filtered.length >= 5) {
+              mapped = filtered;
+            }
+          }
+        }
+
         totalCandidates = mapped.length;
+        console.log(`[Filter] ${products.length} fetched → ${mapped.length} after filter (budget=${budgetVal}, interests=${interestVal}, style=${styleVal}) → AI`);
 
         // 2. Try AI recommendation
         let aiResult = null;
