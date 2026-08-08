@@ -75,6 +75,29 @@ type ProductFilter = {
 };
 
 /**
+ * 返回数据库中所有产品的 asin 列表（用于 sitemap 生成产品详情页 URL）。
+ * Supabase 不可用时返回空数组（sitemap 降级为不包含动态产品详情页，不报错）。
+ */
+export async function getAllProductAsins(): Promise<string[]> {
+  try {
+    const client = getClient();
+    if (!client) return [];
+    const { data, error } = await client
+      .from("products")
+      .select("asin")
+      .not("asin", "is", null);
+    if (!error && data) {
+      return data
+        .map((p: { asin: string | null }) => p.asin)
+        .filter((a): a is string => !!a && /^[A-Z0-9]{10}$/.test(a));
+    }
+  } catch (_) {
+    // ignore — sitemap 生成永远不能抛错
+  }
+  return [];
+}
+
+/**
  * 从 Supabase 查询商品
  * 用法：const { data, error } = await fetchProducts({ audience: "for-him", limit: 8 })
  */

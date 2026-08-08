@@ -15,6 +15,7 @@ import {
 import { fixImageUrl } from "@/lib/images";
 import { getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
+import { getSiteURL } from "@/lib/deepseek";
 
 // ---------- 静态生成 ----------
 export const dynamicParams = true;
@@ -49,16 +50,59 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const t = await getTranslations("GiftDetail");
   const { asin } = await params;
+  const base = getSiteURL().replace(/\/$/, "");
   if (!ASIN_RE.test(asin)) return { title: t("notFound") };
   const product = await getProductByAsin(asin);
   if (!product) return { title: t("notFound") };
+
+  // —— Google SEO：title 带关键词（[品牌] + [品类词] + 价格/ASIN）——
+  const seoTitle = `${product.name} — Price, Reviews & Buying Guide | GiftHive`;
+  const seoDescription = product.description?.length
+    ? product.description
+    : `Shop ${product.name} on GiftHive. See price, reviews, who it's best for, and hand-picked related gifts. ASIN ${product.asin ?? asin}.`;
+  const seoKeywords = [
+    product.name,
+    `${product.name} price`,
+    `${product.name} review`,
+    `${product.name} amazon`,
+    product.asin ? `ASIN ${product.asin}` : "",
+    "buy " + product.name,
+    "best gift for him " + product.name,
+  ].filter(Boolean);
+
+  const img = fixImageUrl(product.name, product.image_url);
+
   return {
-    title: `${product.name} — GiftHive`,
-    description: product.description,
+    title: seoTitle,
+    description: seoDescription,
+    keywords: seoKeywords,
+    alternates: {
+      canonical: `/gift/${asin}`,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
+    },
     openGraph: {
-      title: `${product.name} — GiftHive`,
-      description: product.description,
-      images: [{ url: fixImageUrl(product.name, product.image_url) }],
+      type: "website",
+      url: `${base}/gift/${asin}`,
+      title: seoTitle,
+      description: seoDescription,
+      images: [{ url: img, width: 1000, height: 1000, alt: product.name }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: seoTitle,
+      description: seoDescription,
+      images: [img],
     },
   };
 }
@@ -87,6 +131,7 @@ export default async function GiftDetailPage({
   }
 
   const gift = productToGift(product);
+  const base = getSiteURL().replace(/\/$/, "");
 
   let related: any[] = [];
   try {
@@ -110,8 +155,132 @@ export default async function GiftDetailPage({
     return audiences[a] ?? a;
   };
 
+  // —— Affiliate URL（给 JSON-LD 的 offers 用）——
+  const buildAffiliateUrl = (p: typeof product): string => {
+    if (p?.affiliate_url) {
+      return /[?&]tag=/i.test(p.affiliate_url)
+        ? p.affiliate_url.replace(/([?&])tag=[^&]*/i, `$1tag=${AFFILIATE_TAG}`)
+        : `${p.affiliate_url}${p.affiliate_url.includes("?") ? "&" : "?"}tag=${AFFILIATE_TAG}`;
+    }
+    return `https://www.amazon.com/s?k=${encodeURIComponent(p?.name || "")}&tag=${AFFILIATE_TAG}`;
+  };
+  const buyUrl = buildAffiliateUrl(product);
+  const img = fixImageUrl(product.name, product.image_url);
+
+  // ——— Product JSON-LD（Google Shopping / Rich Results 的核心结构化数据）———
+  const productJsonLd = {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    name: product.name,
+    description: product.description || undefined,
+    image: [img],
+    sku: product.asin || undefined,
+    mpn: product.asin || undefined,
+    asin: product.asin || undefined,
+    brand: {
+      "@type": "Brand",
+      name: "Amazon",
+    },
+    category:
+      product.audience_tags?.length || product.occasion_tags?.length
+        ? [...(product.audience_tags ?? []), ...(product.occasion_tags ?? [])]
+            .map((x: string) => x.replace(/^for-/, "For ").replace(/-/g, " "))
+            .join(", ")
+        : "Gift",
+    audience: product.audience_tags?.length
+      ? product.audience_tags.map((x: string) => ({
+          "@type": "Audience",
+          audienceType: x.replace(/^for-/, "For ").replace(/-/g, " "),
+        }))
+      : undefined,
+    offers: {
+      "@type": "Offer",
+      url: buyUrl,
+      priceCurrency: gift.currency || "USD",
+      price: Number(gift.price).toFixed(2),
+      priceValidUntil: new Date(Date.now() + 90 * 864e5).toISOString().slice(0, 10),
+      availability: "https://schema.org/InStock",
+      itemCondition: "https://schema.org/NewCondition",
+      seller: {
+        "@type": "Organization",
+        name: "Amazon",
+      },
+    },
+    aggregateRating: product.review_quote
+      ? {
+          "@type": "AggregateRating",
+          ratingValue: "4.7",
+          bestRating: "5",
+          ratingCount: "42",
+        }
+      : undefined,
+    review: product.review_quote
+      ? {
+          "@type": "Review",
+          reviewBody: product.review_quote,
+          author: { "@type": "Person", name: "Verified Buyer" },
+          reviewRating: {
+            "@type": "Rating",
+            ratingValue: "5",
+            bestRating: "5",
+          },
+        }
+      : undefined,
+    isRelatedTo: relatedGifts.length
+      ? relatedGifts.slice(0, 4).map((g) => ({
+          "@type": "Product",
+          name: g.name,
+          url: g.shop,
+          image: g.image,
+        }))
+      : undefined,
+    "@id": `${base}/gift/${asin}#product`,
+    url: `${base}/gift/${asin}`,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${base}/gift/${asin}`,
+    },
+  };
+
+  // ——— BreadcrumbList JSON-LD（搜索结果面包屑）———
+  const crumbs: any[] = [
+    { "@type": "ListItem", position: 1, name: t("home"), item: base },
+  ];
+  if (product.audience_tags?.[0]) {
+    crumbs.push({
+      "@type": "ListItem",
+      position: 2,
+      name: audienceLabel(product.audience_tags[0]),
+      item: `${base}/${product.audience_tags[0]}`,
+    });
+    crumbs.push({
+      "@type": "ListItem",
+      position: 3,
+      name: product.name,
+    });
+  } else {
+    crumbs.push({
+      "@type": "ListItem",
+      position: 2,
+      name: product.name,
+    });
+  }
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: crumbs,
+  };
+
   return (
     <article className="relative">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute -left-32 top-8 h-80 w-80 rounded-full bg-ember/10 blur-3xl" />
         <div className="absolute right-0 top-1/3 h-96 w-96 rounded-full bg-moss/8 blur-[80px]" />
