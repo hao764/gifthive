@@ -116,7 +116,7 @@ export default async function ResultsPage({
         audience: hasAnyCustom ? undefined : (audienceSlug as any),
         occasion: hasAnyCustom ? undefined : occasionSlug,
         priceRange: dbPriceRange,
-        limit: 200,
+        limit: 1000,
       });
 
       if (products && products.length > 0) {
