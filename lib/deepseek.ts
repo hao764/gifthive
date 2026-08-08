@@ -21,7 +21,7 @@ import type { Gift } from "./data";
  * 新增/替换 provider 只需要在 PROVIDER_SPECS 里加一条就行。
  * ========================================================================= */
 
-type ProviderName = "DEEPSEEK" | "GROQ" | "SILICONFLOW" | "DASHSCOPE" | "OPENROUTER" | "TOGETHER" | "OPENAI";
+type ProviderName = "DEEPSEEK" | "GROQ" | "NVIDIA_NIM" | "GOOGLE_GEMINI" | "SILICONFLOW" | "DASHSCOPE" | "OPENROUTER" | "TOGETHER" | "OPENAI";
 
 type ProviderSpec = {
   name: ProviderName;
@@ -63,6 +63,28 @@ const PROVIDER_SPECS: ProviderSpec[] = [
     apiKeyEnv: "GROQ_API_KEY",
     baseURL: "https://api.groq.com/openai/v1/chat/completions",
     defaultModel: process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
+  },
+  /* ————— NVIDIA NIM（海外备线 2，免费额度巨大，中国 IP 也能注册）—————
+     · NVIDIA Developer Program：手机号验证即免费，100+ 模型可调用（DeepSeek V4 / Llama 4 / GLM-5）
+     · 速率约 40 RPM / 账户，共享。海外节点 RTT 优秀
+     · 控制台 https://build.nvidia.com ，key 前缀 nvapi-
+  */
+  {
+    name: "NVIDIA_NIM",
+    apiKeyEnv: "NVIDIA_NIM_API_KEY",
+    baseURL: "https://integrate.api.nvidia.com/v1/chat/completions",
+    defaultModel: process.env.NVIDIA_NIM_MODEL || "deepseek-ai/deepseek-v4-flash",
+  },
+  /* ————— Google AI Studio / Gemini（海外备线 3，用户最容易拿到，1500 次/天永久免费）—————
+     · Google 账号直接登录 aistudio.google.com → Get API Key，不用绑卡
+     · 免费额度：15 RPM / 1500 RPD（Gemini 2.5 Flash）
+     · 用 Google 的 OpenAI 兼容网关：generativelanguage.googleapis.com/v1beta/openai
+  */
+  {
+    name: "GOOGLE_GEMINI",
+    apiKeyEnv: "GOOGLE_GEMINI_API_KEY",
+    baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+    defaultModel: process.env.GOOGLE_GEMINI_MODEL || "gemini-2.5-flash",
   },
   {
     name: "SILICONFLOW",
@@ -139,6 +161,8 @@ function reorderByGeo(specs: ProviderSpec[], geoHint: string | undefined): Provi
   ];
   const OVERSEAS_GROUP: ProviderName[] = [
     "GROQ",
+    "NVIDIA_NIM",
+    "GOOGLE_GEMINI",
     "TOGETHER",
     "OPENROUTER",
     "OPENAI",
