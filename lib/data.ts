@@ -1233,7 +1233,27 @@ export const formatPrice = (price: number, currency: string = "$") =>
 // ---------- Supabase Product → Gift 适配器 ----------
 // Supabase 表里的 Product 字段名和 GiftCard 用的 Gift 不一样，这里做一层转换，
 // 让 GiftCard 不用改代码就能直接吃 Supabase 的数据。
+//
+// review_quote 列现在存的是 JSON metadata：{category, gender, style_tags, avoid_tags}
+// 如果解析失败（旧数据格式），fallback 到 price_range → Budget/Mid-Range/Premium
 export function productToGift(p: Product): Gift {
+  // 尝试解析 review_quote 里的 JSON metadata
+  let metadata: { category?: string; gender?: string; style_tags?: string[]; avoid_tags?: string[] } | null = null;
+  let reviewQuote = p.review_quote ?? "";
+  try {
+    const parsed = JSON.parse(reviewQuote);
+    if (parsed && typeof parsed === "object" && parsed.category) {
+      metadata = parsed;
+      reviewQuote = ""; // metadata 不是真正的 review，清空
+    }
+  } catch {
+    // 不是 JSON，保持原样作为 review_quote
+  }
+
+  // category：优先用 metadata 里的真实品类，fallback 到 price_range
+  const category = metadata?.category
+    || (p.price_range === "cheap" ? "Budget" : p.price_range === "mid" ? "Mid-Range" : "Premium");
+
   return {
     id: `sb-${p.id}`,
     name: p.name,
@@ -1241,15 +1261,10 @@ export function productToGift(p: Product): Gift {
     price: Number(p.price),
     currency: "$",
     image: fixImageUrl(p.name, p.image_url),
-    category:
-      p.price_range === "cheap"
-        ? "Budget"
-        : p.price_range === "mid"
-          ? "Mid-Range"
-          : "Premium",
+    category,
     tags: [...p.audience_tags, ...p.occasion_tags],
     match: 0,
-    reason: p.review_quote ?? "",
+    reason: reviewQuote,
     shop: "Amazon",
     amazonUrl: p.affiliate_url || undefined,
   };

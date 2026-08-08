@@ -163,11 +163,11 @@ export default async function ResultsPage({
           if (filtered.length >= 5) mapped = filtered;
         }
 
-        // 2c. 礼物风格匹配
+        // 2c. 礼物风格匹配（支持中文品类 + 英文旧品类）
         const STYLE_CATEGORIES: Record<string, string[]> = {
-          "practical-item": ["Daily", "Home", "Wear", "Stationery", "Desk"],
-          "experience": ["Experience", "Outdoor", "Games"],
-          "creative": ["Games", "Art", "Toys", "Crafts"],
+          "practical-item": ["数码配件", "家居生活", "文具文创", "饰品配饰", "Daily", "Home", "Wear", "Stationery", "Desk"],
+          "experience": ["运动户外", "食品茶饮", "Experience", "Outdoor", "Games"],
+          "creative": ["手工DIY", "毛绒玩具", "文具文创", "Games", "Art", "Toys", "Crafts"],
           "classic": [],
         };
         if (styleVal && !styleVal.startsWith("custom:") && STYLE_CATEGORIES[styleVal]?.length > 0) {
