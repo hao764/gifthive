@@ -14,6 +14,10 @@ const OPTION_LABEL_KEYS: Record<string, Record<string, string>> = {
     him: "him", her: "her", kids: "kids", parents: "parents",
     friends: "friends", other: "other",
   },
+  age: {
+    "under-18": "under18", "18-25": "range18to25", "25-35": "range25to35",
+    "35-50": "range35to50", "50-65": "range50to65", "over-65": "over65",
+  },
   occasion: {
     birthday: "birthday", anniversary: "anniversary", holiday: "holiday",
     thanks: "thanks", apology: "apology", "no-reason": "noReason",
@@ -30,6 +34,10 @@ const OPTION_LABEL_KEYS: Record<string, Record<string, string>> = {
     practical: "practical", romantic: "romantic",
     minimal: "minimal", playful: "playful",
   },
+  giftStyle: {
+    "practical-item": "practicalItem", experience: "experience",
+    creative: "creative", classic: "classic",
+  },
   closeness: {
     partner: "partner", family: "family", "close-friend": "closeFriend",
     colleague: "colleague", acquaintance: "acquaintance", client: "client",
@@ -40,6 +48,10 @@ const OPTION_DESC_KEYS: Record<string, Record<string, string>> = {
   recipient: {
     him: "himDesc", her: "herDesc", kids: "kidsDesc",
     parents: "parentsDesc", friends: "friendsDesc", other: "otherDesc",
+  },
+  giftStyle: {
+    "practical-item": "practicalItemDesc", experience: "experienceDesc",
+    creative: "creativeDesc", classic: "classicDesc",
   },
   personality: {
     practical: "practicalDesc", romantic: "romanticDesc",

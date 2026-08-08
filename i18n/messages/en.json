@@ -29,8 +29,8 @@
       "title1": "Finding a gift",
       "title2": "doesn't have to be",
       "title3": "this hard",
-      "description": "Answer six questions, get five gifts picked by AI that reads the whole catalog — five, not 200.",
-      "ctaPrimary": "Start the 6-step finder",
+      "description": "Answer eight questions, get five gifts picked by AI that reads the whole catalog — five, not 200.",
+      "ctaPrimary": "Start the 8-step finder",
       "ctaSecondary": "Or browse by recipient",
       "stats": {
         "questions": "questions",
@@ -41,7 +41,7 @@
     "marquee": {
       "line1": "GIFTHIVE · The Gift Studio",
       "line2": "Pick the right gift, skip the guessing",
-      "line3": "Six steps, five picks, truly chosen",
+      "line3": "Eight steps, five picks, truly chosen",
       "line4": "EST. 2026",
       "line5": "A gift they'll actually use"
     },
@@ -60,22 +60,26 @@
       "title1": "Skip the endless scroll.",
       "title2": "AI reads,",
       "title3": "you pick.",
-      "description": "We split \"what should I get?\" into six small questions — who, occasion, budget, interests, personality, your relationship. No personal stuff, just sharper than you'd expect.",
+      "description": "We split \"what should I get?\" into eight small questions — who, age, occasion, budget, interests, personality, gift style, your relationship. No personal stuff, just sharper than you'd expect.",
       "ctaStart": "Start now",
       "aboutTime": "About 2 minutes · No sign-up",
       "steps": {
         "s1_title": "Who it's for",
         "s1_desc": "Partner · Parent · Sibling · Friend",
-        "s2_title": "The occasion",
-        "s2_desc": "Birthday · Anniversary · Holiday · Thanks",
-        "s3_title": "The budget",
-        "s3_desc": "A range, or let us decide",
-        "s4_title": "Interests",
-        "s4_desc": "Tech · Coffee · Outdoors · Reading",
-        "s5_title": "Personality",
-        "s5_desc": "Practical / Romantic / Minimalist",
-        "s6_title": "Relationship",
-        "s6_desc": "Partner · Family · Close friend · Coworker"
+        "s2_title": "Their age",
+        "s2_desc": "Under 18 · 18-25 · 25-35 · 35-50 · 50-65 · 65+",
+        "s3_title": "The occasion",
+        "s3_desc": "Birthday · Anniversary · Holiday · Thanks",
+        "s4_title": "The budget",
+        "s4_desc": "A range, or let us decide",
+        "s5_title": "Interests",
+        "s5_desc": "Tech · Coffee · Outdoors · Reading",
+        "s6_title": "Personality",
+        "s6_desc": "Practical / Romantic / Minimalist",
+        "s7_title": "Gift style",
+        "s7_desc": "Practical / Experience / Creative / Classic",
+        "s8_title": "Relationship",
+        "s8_desc": "Partner · Family · Close friend · Coworker"
       }
     },
     "editors": {
@@ -96,8 +100,8 @@
     },
     "closing": {
       "eyebrow": "No. 06 · Still unsure?",
-      "title1": "Hand the headache to a",
-      "title2": "six-step quiz",
+      "title1": "Hand the headache to an",
+      "title2": "eight-step quiz",
       "description": "No sign-up, no email. Two minutes, five picks chosen with care.",
       "cta": "Start the finder"
     }
@@ -106,10 +110,10 @@
     "marquee": {
       "line1": "GIFTHIVE · The Gift Studio",
       "line2": "Pick the right gift, skip the guessing",
-      "line3": "Six steps, five picks, truly chosen",
+      "line3": "Eight steps, five picks, truly chosen",
       "line4": "EST. 2026"
     },
-    "description": "We turn \"what should I get?\" into a six-step quiz you might actually enjoy. Every pick was held and used by a real person — not invented by an algorithm.",
+    "description": "We turn \"what should I get?\" into an eight-step quiz you might actually enjoy. Every pick was held and used by a real person — not invented by an algorithm.",
     "nav": {
       "home": "Home",
       "finder": "Gift Finder"
@@ -170,8 +174,8 @@
   },
   "Quiz": {
     "eyebrow": "Gift Finder",
-    "badge": "6 questions",
-    "title1": "Six steps to the gift",
+    "badge": "8 questions",
+    "title1": "Eight steps to the gift",
     "title2": "they'll actually use",
     "subtitle": "There are no right answers. The more honest you are, the closer it lands.",
     "loadingTitle": "Picking five gifts for you…",
@@ -198,6 +202,18 @@
         "friendsDesc": "Close friend",
         "other": "Someone else",
         "otherDesc": "Custom"
+      },
+      "age": {
+        "title": "How old are they?",
+        "subtitle": "Age narrows the field — a 25-year-old and a 55-year-old are worlds apart.",
+        "customLabel": "Or tell me their exact age",
+        "customPlaceholder": "e.g. just turned 22, almost 40, 70 but still active",
+        "under18": "Under 18",
+        "range18to25": "18 – 25",
+        "range25to35": "25 – 35",
+        "range35to50": "35 – 50",
+        "range50to65": "50 – 65",
+        "over65": "Over 65"
       },
       "occasion": {
         "title": "What's the occasion?",
@@ -248,6 +264,20 @@
         "minimalDesc": "Less is more",
         "playful": "Playful",
         "playfulDesc": "Can't resist new things"
+      },
+      "giftStyle": {
+        "title": "What style of gift?",
+        "subtitle": "A physical thing, an experience, or a surprise — you decide the direction.",
+        "customLabel": "Or describe the vibe you want",
+        "customPlaceholder": "e.g. something they'll use every day, something unexpected, an experience rather than a thing",
+        "practicalItem": "Practical item",
+        "practicalItemDesc": "Something they'll use daily",
+        "experience": "Experience",
+        "experienceDesc": "A memory, not an object",
+        "creative": "Creative surprise",
+        "creativeDesc": "Unexpected and fun",
+        "classic": "Classic & safe",
+        "classicDesc": "Can't go wrong"
       },
       "closeness": {
         "title": "How close are you?",
@@ -440,6 +470,16 @@
       "parents": "For Parents",
       "friends": "For Friends",
       "other": "Someone else",
+      "under18": "Under 18",
+      "range18to25": "18 – 25",
+      "range25to35": "25 – 35",
+      "range35to50": "35 – 50",
+      "range50to65": "50 – 65",
+      "over65": "Over 65",
+      "practicalItem": "Practical item",
+      "experience": "Experience",
+      "creative": "Creative surprise",
+      "classic": "Classic & safe",
       "birthday": "Birthday",
       "anniversary": "Anniversary",
       "holiday": "Holiday",

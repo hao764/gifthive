@@ -35,10 +35,12 @@ const OCCASION_MAP: Record<string, string> = {
 
 type SearchParams = {
   recipient?: string;
+  age?: string;
   occasion?: string;
   budget?: string;
   interests?: string;
   personality?: string;
+  giftStyle?: string;
   closeness?: string;
 };
 
@@ -70,10 +72,12 @@ export default async function ResultsPage({
 
     const quizAnswers: Record<string, string | undefined> = {
       recipient: searchParams?.recipient,
+      age: searchParams?.age,
       occasion: searchParams?.occasion,
       budget: searchParams?.budget,
       interests: searchParams?.interests,
       personality: searchParams?.personality,
+      giftStyle: searchParams?.giftStyle,
       closeness: searchParams?.closeness,
     };
 
@@ -90,16 +94,35 @@ export default async function ResultsPage({
 
     try {
       // 1. Fetch candidate products from Supabase
-      // If user typed custom text, fetch a broader pool (no audience/occasion filter)
-      // so the AI has more candidates to match against their custom description
+      // 拉取更大的候选池（200件），然后做本地预算预过滤，只把少量高匹配候选传给 AI
+      // 这样大幅降低 AI 调用成本（token 数），同时保证推荐质量
       const { data: products } = await fetchProducts({
         audience: hasAnyCustom ? undefined : (audienceSlug as any),
         occasion: hasAnyCustom ? undefined : occasionSlug,
-        limit: 50,
+        limit: 200,
       });
 
       if (products && products.length > 0) {
-        const mapped = products.map(productToGift) as AIGift[];
+        let mapped = products.map(productToGift) as AIGift[];
+
+        // ————— 基础条件预过滤：预算 —————
+        // 严格按用户选的预算区间过滤，超预算的直接剔除，不传给 AI
+        const budgetVal = quizAnswers.budget;
+        if (budgetVal && !budgetVal.startsWith("custom:")) {
+          mapped = mapped.filter((g) => {
+            const p = g.price;
+            switch (budgetVal) {
+              case "0-30": return p < 30;
+              case "30-75": return p >= 30 && p < 75;
+              case "75-150": return p >= 75 && p < 150;
+              case "150-400": return p >= 150 && p <= 400;
+              case "400+": return p > 400;
+              case "flexible": return true; // 不过滤
+              default: return true;
+            }
+          });
+        }
+
         totalCandidates = mapped.length;
 
         // 2. Try AI recommendation

@@ -236,6 +236,15 @@ const RECIPIENT_MAP: Record<string, string> = {
   other: "someone",
 };
 
+const AGE_MAP: Record<string, string> = {
+  "under-18": "Under 18",
+  "18-25": "18 – 25",
+  "25-35": "25 – 35",
+  "35-50": "35 – 50",
+  "50-65": "50 – 65",
+  "over-65": "Over 65",
+};
+
 const OCCASION_MAP: Record<string, string> = {
   birthday: "Birthday",
   anniversary: "Anniversary",
@@ -261,6 +270,13 @@ const PERSONALITY_MAP: Record<string, string> = {
   playful: "Playful — fun & quirky",
 };
 
+const GIFT_STYLE_MAP: Record<string, string> = {
+  "practical-item": "Practical item — something they'll use daily",
+  experience: "Experience — a memory, not an object",
+  creative: "Creative surprise — unexpected and fun",
+  classic: "Classic & safe — can't go wrong",
+};
+
 const CLOSENESS_MAP: Record<string, string> = {
   partner: "Partner (very close)",
   family: "Family member",
@@ -280,6 +296,12 @@ function formatQuizAnswers(answers: Record<string, string | undefined>): string 
     const c = getCustom(answers.recipient);
     lines.push(
       `- Gift recipient: ${c ?? RECIPIENT_MAP[answers.recipient] ?? answers.recipient}`
+    );
+  }
+  if (answers.age) {
+    const c = getCustom(answers.age);
+    lines.push(
+      `- Recipient age: ${c ?? AGE_MAP[answers.age] ?? answers.age}`
     );
   }
   if (answers.occasion) {
@@ -302,6 +324,12 @@ function formatQuizAnswers(answers: Record<string, string | undefined>): string 
     const c = getCustom(answers.personality);
     lines.push(
       `- Personality: ${c ?? PERSONALITY_MAP[answers.personality] ?? answers.personality}`
+    );
+  }
+  if (answers.giftStyle) {
+    const c = getCustom(answers.giftStyle);
+    lines.push(
+      `- Gift style preference: ${c ?? GIFT_STYLE_MAP[answers.giftStyle] ?? answers.giftStyle}`
     );
   }
   if (answers.closeness) {
@@ -465,24 +493,27 @@ export async function getAIGiftRecommendations(
   }));
 
   const systemPrompt = [
-    "You are an expert gift curator. Given a user's gift-giving profile and a catalog of real products,",
-    "pick the BEST 5 gifts that fit them. The user may provide custom descriptions instead of preset categories —",
-    "treat custom descriptions as the MOST accurate expression of their intent and prioritize them over presets.",
+    "你是专业礼品推荐师，严格根据提供的商品列表和用户需求筛选礼物。",
     "",
-    "For each pick, write a personalized 1-2 sentence reason explaining WHY this specific gift fits THIS specific person.",
-    "Be specific: reference their interests, personality, occasion, relationship, or budget constraints.",
+    "要求：",
+    "1. 从商品列表中选出3-5件最匹配的礼物，按推荐优先级排序",
+    "2. 每件商品附上1句话推荐理由，贴合用户需求",
+    "3. 严格遵守用户预算，不得推荐超出预算的商品",
+    "4. 只返回JSON格式，不要多余解释",
     "",
     "Return ONLY valid JSON matching this shape (no markdown, no preamble, no explanation outside JSON):",
-    '{"picks":[{"product_id":"<catalog.id>","reason":"<personalized 1-2 sentences>","match_score":<0-100 integer>}]}',
-  ].join(" ");
+    '{"picks":[{"product_id":"<catalog.id>","reason":"<1 sentence in the user\'s language>","match_score":<0-100 integer>}]}',
+  ].join("\n");
 
-  // 英文用户 → 英文写 reason；中文/日文 → 仍然用英文写 reason（因为商品都是 Amazon 英文，
-  // 海外用户占绝大多数；UI 侧如果要 i18n 可以以后再做 reason 翻译）。这里故意强制英文。
-  const userPrompt = `User's gift-giving profile:\n${userProfile}\n\nAvailable products (pick exactly the best 5, fewer only if the catalog is very small):\n${JSON.stringify(
-    productCatalog,
-    null,
-    2
-  )}\n\nReturn ONLY JSON as specified above. Do not invent product_ids that are not in the catalog.`;
+  const userPrompt = [
+    "【商品列表】",
+    JSON.stringify(productCatalog, null, 2),
+    "",
+    "【用户需求】",
+    userProfile,
+    "",
+    "只返回JSON格式，不要多余解释。Do not invent product_ids that are not in the catalog.",
+  ].join("\n");
 
   // 每个 provider 的超时时间递减：第一个给宽一点，后面快切
   const timeouts = [10_000, 7_000, 6_000, 5_000];

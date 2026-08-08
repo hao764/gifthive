@@ -1115,7 +1115,7 @@ export const articles: Article[] = [
   },
 ];
 
-// ---------- Quiz: 6 questions ----------
+// ---------- Quiz: 8 questions ----------
 export const quizQuestions: QuizQuestion[] = [
   {
     id: 1,
@@ -1133,6 +1133,20 @@ export const quizQuestions: QuizQuestion[] = [
   },
   {
     id: 2,
+    key: "age",
+    title: "How old are they?",
+    subtitle: "Age narrows the field — a 25-year-old and a 55-year-old are worlds apart.",
+    options: [
+      { value: "under-18", label: "Under 18" },
+      { value: "18-25", label: "18 – 25" },
+      { value: "25-35", label: "25 – 35" },
+      { value: "35-50", label: "35 – 50" },
+      { value: "50-65", label: "50 – 65" },
+      { value: "over-65", label: "Over 65" },
+    ],
+  },
+  {
+    id: 3,
     key: "occasion",
     title: "What's the occasion?",
     subtitle: "Occasion changes what 'right' even means.",
@@ -1146,7 +1160,7 @@ export const quizQuestions: QuizQuestion[] = [
     ],
   },
   {
-    id: 3,
+    id: 4,
     key: "budget",
     title: "What's your budget?",
     subtitle: "A range is fine — we'll find the best within it.",
@@ -1160,7 +1174,7 @@ export const quizQuestions: QuizQuestion[] = [
     ],
   },
   {
-    id: 4,
+    id: 5,
     key: "interests",
     title: "What do they love?",
     subtitle: "Pick all that fit — the more you choose, the sharper it gets.",
@@ -1174,7 +1188,7 @@ export const quizQuestions: QuizQuestion[] = [
     ],
   },
   {
-    id: 5,
+    id: 6,
     key: "personality",
     title: "Their personality?",
     subtitle: "This decides practical versus romantic.",
@@ -1186,7 +1200,19 @@ export const quizQuestions: QuizQuestion[] = [
     ],
   },
   {
-    id: 6,
+    id: 7,
+    key: "giftStyle",
+    title: "What style of gift?",
+    subtitle: "A physical thing, an experience, or a surprise — you decide the direction.",
+    options: [
+      { value: "practical-item", label: "Practical item", description: "Something they'll use daily" },
+      { value: "experience", label: "Experience", description: "A memory, not an object" },
+      { value: "creative", label: "Creative surprise", description: "Unexpected and fun" },
+      { value: "classic", label: "Classic & safe", description: "Can't go wrong" },
+    ],
+  },
+  {
+    id: 8,
     key: "closeness",
     title: "How close are you?",
     subtitle: "Last one — closeness sets the weight of the gift.",
