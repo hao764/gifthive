@@ -60,3 +60,85 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: 43a844e46a9646a8887ebb9672dd1a09
+
+      - name: Wait for deployment to go live
+        run: sleep 30
+
+      - name: Ping IndexNow (Bing/Yandex/Naver)
+        run: |
+          curl -s -o /dev/null -w "IndexNow: HTTP %{http_code}\n" -X POST "https://api.indexnow.org/IndexNow" \
+            -H "Content-Type: application/json; charset=utf-8" \
+            -d '{
+              "host": "gifthive.pages.dev",
+              "key": "baf4a1aef06e13300266250f24dde20b",
+              "keyLocation": "https://gifthive.pages.dev/baf4a1aef06e13300266250f24dde20b.txt",
+              "urlList": [
+                "https://gifthive.pages.dev/",
+                "https://gifthive.pages.dev/quiz",
+                "https://gifthive.pages.dev/journal",
+                "https://gifthive.pages.dev/for-him",
+                "https://gifthive.pages.dev/for-her",
+                "https://gifthive.pages.dev/for-kids",
+                "https://gifthive.pages.dev/for-parents",
+                "https://gifthive.pages.dev/for-friends",
+                "https://gifthive.pages.dev/for-coworkers",
+                "https://gifthive.pages.dev/best-gifts/boyfriend-birthday",
+                "https://gifthive.pages.dev/best-gifts/girlfriend-birthday",
+                "https://gifthive.pages.dev/best-gifts/anniversary-husband",
+                "https://gifthive.pages.dev/best-gifts/anniversary-wife",
+                "https://gifthive.pages.dev/best-gifts/mom-birthday",
+                "https://gifthive.pages.dev/best-gifts/dad-christmas",
+                "https://gifthive.pages.dev/best-gifts/gifts-5-year-old-boy",
+                "https://gifthive.pages.dev/best-gifts/gifts-8-year-old-girl",
+                "https://gifthive.pages.dev/best-gifts/gifts-for-nurse-female",
+                "https://gifthive.pages.dev/best-gifts/bridesmaid-proposal-gifts",
+                "https://gifthive.pages.dev/best-gifts/groomsmen-proposal-gifts",
+                "https://gifthive.pages.dev/best-gifts/secret-santa-office-25",
+                "https://gifthive.pages.dev/best-gifts/last-minute-christmas-gifts",
+                "https://gifthive.pages.dev/best-gifts/boyfriend-likes-fishing",
+                "https://gifthive.pages.dev/best-gifts/boyfriend-likes-tech",
+                "https://gifthive.pages.dev/best-gifts/guy-best-friend-21st",
+                "https://gifthive.pages.dev/best-gifts/toddler-girl-2nd-birthday",
+                "https://gifthive.pages.dev/best-gifts/40th-anniversary-parents",
+                "https://gifthive.pages.dev/best-gifts/best-friend-female-birthday",
+                "https://gifthive.pages.dev/best-gifts/boss-christmas"
+              ]
+            }' || true
+          curl -s -o /dev/null -w "Bing: HTTP %{http_code}\n" -X POST "https://www.bing.com/indexnow" \
+            -H "Content-Type: application/json; charset=utf-8" \
+            -d '{
+              "host": "gifthive.pages.dev",
+              "key": "baf4a1aef06e13300266250f24dde20b",
+              "keyLocation": "https://gifthive.pages.dev/baf4a1aef06e13300266250f24dde20b.txt",
+              "urlList": [
+                "https://gifthive.pages.dev/",
+                "https://gifthive.pages.dev/quiz",
+                "https://gifthive.pages.dev/journal",
+                "https://gifthive.pages.dev/for-him",
+                "https://gifthive.pages.dev/for-her",
+                "https://gifthive.pages.dev/for-kids",
+                "https://gifthive.pages.dev/for-parents",
+                "https://gifthive.pages.dev/for-friends",
+                "https://gifthive.pages.dev/for-coworkers",
+                "https://gifthive.pages.dev/best-gifts/boyfriend-birthday",
+                "https://gifthive.pages.dev/best-gifts/girlfriend-birthday",
+                "https://gifthive.pages.dev/best-gifts/anniversary-husband",
+                "https://gifthive.pages.dev/best-gifts/anniversary-wife",
+                "https://gifthive.pages.dev/best-gifts/mom-birthday",
+                "https://gifthive.pages.dev/best-gifts/dad-christmas",
+                "https://gifthive.pages.dev/best-gifts/gifts-5-year-old-boy",
+                "https://gifthive.pages.dev/best-gifts/gifts-8-year-old-girl",
+                "https://gifthive.pages.dev/best-gifts/gifts-for-nurse-female",
+                "https://gifthive.pages.dev/best-gifts/bridesmaid-proposal-gifts",
+                "https://gifthive.pages.dev/best-gifts/groomsmen-proposal-gifts",
+                "https://gifthive.pages.dev/best-gifts/secret-santa-office-25",
+                "https://gifthive.pages.dev/best-gifts/last-minute-christmas-gifts",
+                "https://gifthive.pages.dev/best-gifts/boyfriend-likes-fishing",
+                "https://gifthive.pages.dev/best-gifts/boyfriend-likes-tech",
+                "https://gifthive.pages.dev/best-gifts/guy-best-friend-21st",
+                "https://gifthive.pages.dev/best-gifts/toddler-girl-2nd-birthday",
+                "https://gifthive.pages.dev/best-gifts/40th-anniversary-parents",
+                "https://gifthive.pages.dev/best-gifts/best-friend-female-birthday",
+                "https://gifthive.pages.dev/best-gifts/boss-christmas"
+              ]
+            }' || true
