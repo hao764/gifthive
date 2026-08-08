@@ -73,7 +73,10 @@ const PROVIDER_SPECS: ProviderSpec[] = [
     name: "NVIDIA_NIM",
     apiKeyEnv: "NVIDIA_NIM_API_KEY",
     baseURL: "https://integrate.api.nvidia.com/v1/chat/completions",
-    defaultModel: process.env.NVIDIA_NIM_MODEL || "deepseek-ai/deepseek-v4-flash",
+    // NOTE: deepseek-v4-flash/v4-pro EOL 2026-08-07; llama-4 models EOL 2026-07.
+    // NVIDIA's own nemotron-3-super-120b-a12b is verified alive on 2026-08-08,
+    // MoE 120B, reasoning quality good enough for gift ranking.
+    defaultModel: process.env.NVIDIA_NIM_MODEL || "nvidia/nemotron-3-super-120b-a12b",
   },
   /* ————— Google AI Studio / Gemini（海外备线 3，用户最容易拿到，1500 次/天永久免费）—————
      · Google 账号直接登录 aistudio.google.com → Get API Key，不用绑卡
