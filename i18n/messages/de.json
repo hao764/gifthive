@@ -29,8 +29,8 @@
       "title1": "Ein Geschenk finden",
       "title2": "muss nicht so",
       "title3": "schwer sein",
-      "description": "Beantworte sechs Fragen, erhalte fünf Geschenke von einer KI, die den gesamten Katalog liest — fünf, nicht 200",
-      "ctaPrimary": "6-Schritte-Finder starten",
+      "description": "Beantworte acht Fragen, erhalte fünf Geschenke von einer KI, die den gesamten Katalog liest — fünf, nicht 200",
+      "ctaPrimary": "8-Schritte-Finder starten",
       "ctaSecondary": "Oder nach Empfänger browsen",
       "stats": {
         "questions": "Fragen",
@@ -41,7 +41,7 @@
     "marquee": {
       "line1": "GIFTHIVE · Das Geschenk-Studio",
       "line2": "Das richtige Geschenk finden, ohne zu raten",
-      "line3": "Sechs Schritte, fünf Auswahl, wirklich ausgewählt",
+      "line3": "Acht Schritte, fünf Auswahl, wirklich ausgewählt",
       "line4": "Gegründet 2026",
       "line5": "Ein Geschenk, das sie wirklich benutzen"
     },
@@ -60,22 +60,26 @@
       "title1": "Endloses Scrollen überspringen.",
       "title2": "KI liest,",
       "title3": "du wählst",
-      "description": "Wir haben \"was soll ich schenken?\" in sechs kleine Fragen aufgeteilt — wer, Anlass, Budget, Interessen, Persönlichkeit, eure Beziehung. Keine persönlichen Daten, präziser als du erwartest",
+      "description": "Wir haben \"was soll ich schenken?\" in acht kleine Fragen aufgeteilt — wer, Alter, Anlass, Budget, Interessen, Persönlichkeit, Geschenkstil, eure Beziehung. Keine persönlichen Daten, präziser als du erwartest",
       "ctaStart": "Jetzt starten",
       "aboutTime": "Ca. 2 Minuten · Keine Anmeldung",
       "steps": {
         "s1_title": "Für wen",
         "s1_desc": "Partner · Eltern · Geschwister · Freund",
-        "s2_title": "Der Anlass",
-        "s2_desc": "Geburtstag · Jubiläum · Feiertag · Danke",
-        "s3_title": "Das Budget",
-        "s3_desc": "Eine Spanne, oder wir entscheiden lassen",
-        "s4_title": "Interessen",
-        "s4_desc": "Tech · Kaffee · Outdoor · Lesen",
-        "s5_title": "Persönlichkeit",
-        "s5_desc": "Praktisch / Romantisch / Minimalistisch",
-        "s6_title": "Beziehung",
-        "s6_desc": "Partner · Familie · Enger Freund · Kollege"
+        "s2_title": "Das Alter",
+        "s2_desc": "Unter 18 · 18-25 · 25-35 · 35-50 · 50-65 · 65+",
+        "s3_title": "Der Anlass",
+        "s3_desc": "Geburtstag · Jubiläum · Feiertag · Danke",
+        "s4_title": "Das Budget",
+        "s4_desc": "Eine Spanne, oder wir entscheiden lassen",
+        "s5_title": "Interessen",
+        "s5_desc": "Tech · Kaffee · Outdoor · Lesen",
+        "s6_title": "Persönlichkeit",
+        "s6_desc": "Praktisch / Romantisch / Minimalistisch",
+        "s7_title": "Geschenkstil",
+        "s7_desc": "Praktisch / Erlebnis / Kreativ / Klassisch",
+        "s8_title": "Beziehung",
+        "s8_desc": "Partner · Familie · Enger Freund · Kollege"
       }
     },
     "editors": {
@@ -97,7 +101,7 @@
     "closing": {
       "eyebrow": "Nr. 06 · Noch unsicher?",
       "title1": "Übergib den Kopfschmerz an ein",
-      "title2": "sechs-Schritte-Quiz",
+      "title2": "acht-Schritte-Quiz",
       "description": "Keine Anmeldung, keine E-Mail. Zwei Minuten, fünf Auswahl mit Sorgfalt getroffen",
       "cta": "Finder starten"
     }
@@ -106,10 +110,10 @@
     "marquee": {
       "line1": "GIFTHIVE · Das Geschenk-Studio",
       "line2": "Das richtige Geschenk finden, ohne zu raten",
-      "line3": "Sechs Schritte, fünf Auswahl, wirklich ausgewählt",
+      "line3": "Acht Schritte, fünf Auswahl, wirklich ausgewählt",
       "line4": "Gegründet 2026"
     },
-    "description": "Wir machen aus \"was soll ich schenken?\" ein sechs-Schritte-Quiz, das du vielleicht sogar genießt. Jede Auswahl wurde von einer echten Person gehalten und benutzt — nicht von einem Algorithmus erfunden",
+    "description": "Wir machen aus \"was soll ich schenken?\" ein acht-Schritte-Quiz, das du vielleicht sogar genießt. Jede Auswahl wurde von einer echten Person gehalten und benutzt — nicht von einem Algorithmus erfunden",
     "nav": {
       "home": "Startseite",
       "finder": "Geschenk-Finder"
@@ -170,11 +174,11 @@
   },
   "Quiz": {
     "eyebrow": "Geschenk-Finder",
-    "badge": "6 Fragen",
-    "title1": "Sechs Schritte zum Geschenk,",
+    "badge": "8 Fragen",
+    "title1": "Acht Schritte zum Geschenk",
     "title2": "das sie wirklich benutzen",
-    "subtitle": "Es gibt keine richtigen Antworten. Je ehrlicher du bist, desto besser trifft es zu.",
-    "loadingTitle": "Wir wählen fünf Geschenke für dich aus…",
+    "subtitle": "Es gibt keine richtigen Antworten. Je ehrlicher du bist, desto genauer trifft es.",
+    "loadingTitle": "Wähle fünf Geschenke für dich aus…",
     "loadingSubtitle": "200+ Auswahl wird nach Interesse, Budget und Beziehung abgeglichen.",
     "answeredSoFar": "Bisher beantwortet",
     "back": "Zurück",

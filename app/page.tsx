@@ -40,6 +40,8 @@ export default async function HomePage() {
     { n: "04", t: t("finder.steps.s4_title"), d: t("finder.steps.s4_desc") },
     { n: "05", t: t("finder.steps.s5_title"), d: t("finder.steps.s5_desc") },
     { n: "06", t: t("finder.steps.s6_title"), d: t("finder.steps.s6_desc") },
+    { n: "07", t: t("finder.steps.s7_title"), d: t("finder.steps.s7_desc") },
+    { n: "08", t: t("finder.steps.s8_title"), d: t("finder.steps.s8_desc") },
   ];
 
   return (
@@ -110,7 +112,7 @@ export default async function HomePage() {
               <Reveal delay={320}>
                 <div className="glass mt-12 grid max-w-md grid-cols-3 gap-6 rounded-2xl p-6">
                   {[
-                    { num: "6", label: t("hero.stats.questions") },
+                    { num: "8", label: t("hero.stats.questions") },
                     { num: "5", label: t("hero.stats.picks") },
                     {
                       num: formatGiftsFound(totalCount),

@@ -29,8 +29,8 @@
       "title1": "Encontrar un regalo",
       "title2": "no tiene que ser",
       "title3": "tan difícil",
-      "description": "Responde seis preguntas, recibe cinco regalos seleccionados por IA que lee todo el catálogo — cinco, no 200",
-      "ctaPrimary": "Iniciar el buscador de 6 pasos",
+      "description": "Responde ocho preguntas, recibe cinco regalos seleccionados por IA que lee todo el catálogo — cinco, no 200",
+      "ctaPrimary": "Iniciar el buscador de 8 pasos",
       "ctaSecondary": "O navegar por destinatario",
       "stats": {
         "questions": "preguntas",
@@ -41,7 +41,7 @@
     "marquee": {
       "line1": "GIFTHIVE · El Estudio de Regalos",
       "line2": "Encuentra el regalo adecuado, sin adivinar",
-      "line3": "Seis pasos, cinco selecciones, verdaderamente elegidas",
+      "line3": "Ocho pasos, cinco selecciones, verdaderamente elegidas",
       "line4": "Fundado en 2026",
       "line5": "Un regalo que realmente usarán"
     },
@@ -60,22 +60,26 @@
       "title1": "Salta el scroll infinito.",
       "title2": "IA lee,",
       "title3": "tú eliges",
-      "description": "Dividimos \"¿qué debería regalar?\" en seis pequeñas preguntas — quién, ocasión, presupuesto, intereses, personalidad, tu relación. Sin cosas personales, más preciso de lo que esperas",
+      "description": "Dividimos \"¿qué debería regalar?\" en ocho pequeñas preguntas — quién, edad, ocasión, presupuesto, intereses, personalidad, estilo de regalo, tu relación. Sin cosas personales, más preciso de lo que esperas",
       "ctaStart": "Empezar ahora",
       "aboutTime": "Aprox. 2 minutos · Sin registro",
       "steps": {
         "s1_title": "Para quién es",
         "s1_desc": "Pareja · Padre · Hermano(a) · Amigo",
-        "s2_title": "La ocasión",
-        "s2_desc": "Cumpleaños · Aniversario · Vacaciones · Agradecimiento",
-        "s3_title": "El presupuesto",
-        "s3_desc": "Un rango, o déjanos decidir",
-        "s4_title": "Intereses",
-        "s4_desc": "Tecnología · Café · Exteriores · Lectura",
-        "s5_title": "Personalidad",
-        "s5_desc": "Práctico / Romántico / Minimalista",
-        "s6_title": "Relación",
-        "s6_desc": "Pareja · Familia · Amigo cercano · Compañero"
+        "s2_title": "La edad",
+        "s2_desc": "Menos de 18 · 18-25 · 25-35 · 35-50 · 50-65 · 65+",
+        "s3_title": "La ocasión",
+        "s3_desc": "Cumpleaños · Aniversario · Vacaciones · Agradecimiento",
+        "s4_title": "El presupuesto",
+        "s4_desc": "Un rango, o déjanos decidir",
+        "s5_title": "Intereses",
+        "s5_desc": "Tecnología · Café · Exteriores · Lectura",
+        "s6_title": "Personalidad",
+        "s6_desc": "Práctico / Romántico / Minimalista",
+        "s7_title": "Estilo de regalo",
+        "s7_desc": "Práctico / Experiencia / Creativo / Clásico",
+        "s8_title": "Relación",
+        "s8_desc": "Pareja · Familia · Amigo cercano · Compañero"
       }
     },
     "editors": {
@@ -97,7 +101,7 @@
     "closing": {
       "eyebrow": "N.º 06 · ¿Aún inseguro?",
       "title1": "Entrega el dolor de cabeza a un",
-      "title2": "cuestionario de seis pasos",
+      "title2": "cuestionario de ocho pasos",
       "description": "Sin registro, sin correo. Dos minutos, cinco selecciones elegidas con cuidado",
       "cta": "Iniciar buscador"
     }
@@ -106,10 +110,10 @@
     "marquee": {
       "line1": "GIFTHIVE · El Estudio de Regalos",
       "line2": "Encuentra el regalo adecuado, sin adivinar",
-      "line3": "Seis pasos, cinco selecciones, verdaderamente elegidas",
+      "line3": "Ocho pasos, cinco selecciones, verdaderamente elegidas",
       "line4": "Fundado en 2026"
     },
-    "description": "Convertimos \"¿qué debería regalar?\" en un cuestionario de seis pasos que podrías disfrutar. Cada selección fue sostenida y usada por una persona real — no inventada por un algoritmo",
+    "description": "Convertimos \"¿qué debería regalar?\" en un cuestionario de ocho pasos que podrías disfrutar. Cada selección fue sostenida y usada por una persona real — no inventada por un algoritmo",
     "nav": {
       "home": "Inicio",
       "finder": "Buscador de regalos"
@@ -170,11 +174,11 @@
   },
   "Quiz": {
     "eyebrow": "Buscador de regalos",
-    "badge": "6 preguntas",
-    "title1": "Seis pasos para el regalo",
+    "badge": "8 preguntas",
+    "title1": "Ocho pasos para el regalo",
     "title2": "que realmente usarán",
-    "subtitle": "No hay respuestas correctas. Cuanto más honesto seas, más acertado será.",
-    "loadingTitle": "Seleccionando cinco regalos para ti…",
+    "subtitle": "No hay respuestas correctas. Cuanto más honesto seas, más cerca caerá.",
+    "loadingTitle": "Eligiendo cinco regalos para ti…",
     "loadingSubtitle": "Emparejando más de 200 selecciones por interés, presupuesto y relación.",
     "answeredSoFar": "Respondidas hasta ahora",
     "back": "Atrás",
