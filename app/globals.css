@@ -297,70 +297,6 @@
     transform: translateY(0);
   }
 
-  /* ============ OPPO Find X8 暗色模式 专项适配 ============
-     上面的颜色 Tailwind 已经走 CSS 变量了，这里负责硬编码的纹理/玻璃/滚动条。 */
-  @media (prefers-color-scheme: dark) {
-    /* 滚动条：暗底暖棕灰风格（ColorOS 滚动条） */
-    ::-webkit-scrollbar-track {
-      background: rgb(var(--cream));
-    }
-    ::-webkit-scrollbar-thumb {
-      background: rgb(var(--ink-faint));
-      border: 2px solid rgb(var(--cream));
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgb(var(--ember));
-    }
-
-    /* Apple 玻璃质感：反向暗底玻璃（白底内光 + 暖灰毛玻璃） */
-    .glass {
-      background: rgb(var(--cream-warm) / var(--glass-bg-alpha));
-      border-color: rgb(var(--ink) / 0.06);
-      box-shadow:
-        0 1px 0 0 rgb(var(--ink) / 0.04) inset,
-        0 0 0 1px rgb(var(--ink) / 0.04),
-        0 12px 40px -10px rgb(0 0 0 / 0.45);
-    }
-    .glass-dark {
-      background: rgb(var(--ink) / 0.25);
-      border-color: rgb(var(--ink) / 0.12);
-      box-shadow:
-        0 1px 0 0 rgb(var(--ink) / 0.08) inset,
-        0 16px 52px -12px rgb(0 0 0 / 0.6);
-    }
-    .glass-warm {
-      background: rgb(var(--cream-deep) / 0.28);
-      border-color: rgb(var(--ember) / 0.12);
-      box-shadow:
-        0 1px 0 0 rgb(var(--ink) / 0.05) inset,
-        0 8px 32px -10px rgb(0 0 0 / 0.4);
-    }
-
-    /* 纸张噪点纹理：暗底 → 混合模式改成 overlay（multiply 在暗底上是黑） + 换成暖米白噪点 */
-    .grain::after {
-      mix-blend-mode: overlay;
-      opacity: 0.32;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.92 0 0 0 0 0.88 0 0 0 0 0.82 0 0 0 0.10 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    }
-
-    /* 纸张点阵纹理：暗底 → 点阵换成暖米白极低 alpha，不再是墨色 */
-    .paper-texture {
-      background-image:
-        radial-gradient(rgb(var(--ink) / 0.025) 1px, transparent 1px),
-        radial-gradient(rgb(var(--ink) / 0.015) 1px, transparent 1px);
-    }
-
-    /* 编辑主按钮：暗色下文字"text-cream"不能太接近新 cream 背景（会糊），强制改成ink */
-    .btn-primary {
-      color: rgb(var(--ink));
-    }
-
-    /* Reveal 入场：暗色稍微放大透明度反差，更容易看见 */
-    .reveal {
-      transform: translateY(20px);
-    }
-  }
-
   .text-balance {
     text-wrap: balance;
   }
@@ -399,5 +335,71 @@
       opacity: 1;
       transform: translateY(0) scale(1);
     }
+  }
+}
+
+/* ============================================================
+   OPPO Find X8 暗色模式 专项适配（顶层 @media，不嵌套在 @layer 内）
+   上面的颜色 Tailwind 已经走 CSS 变量了，这里负责硬编码的纹理/玻璃/滚动条。
+   ============================================================ */
+@media (prefers-color-scheme: dark) {
+  /* 滚动条：暗底暖棕灰风格（ColorOS 滚动条） */
+  ::-webkit-scrollbar-track {
+    background: rgb(var(--cream));
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgb(var(--ink-faint));
+    border: 2px solid rgb(var(--cream));
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--ember));
+  }
+
+  /* Apple 玻璃质感：反向暗底玻璃（白底内光 + 暖灰毛玻璃） */
+  .glass {
+    background: rgb(var(--cream-warm) / var(--glass-bg-alpha));
+    border-color: rgb(var(--ink) / 0.06);
+    box-shadow:
+      0 1px 0 0 rgb(var(--ink) / 0.04) inset,
+      0 0 0 1px rgb(var(--ink) / 0.04),
+      0 12px 40px -10px rgb(0 0 0 / 0.45);
+  }
+  .glass-dark {
+    background: rgb(var(--ink) / 0.25);
+    border-color: rgb(var(--ink) / 0.12);
+    box-shadow:
+      0 1px 0 0 rgb(var(--ink) / 0.08) inset,
+      0 16px 52px -12px rgb(0 0 0 / 0.6);
+  }
+  .glass-warm {
+    background: rgb(var(--cream-deep) / 0.28);
+    border-color: rgb(var(--ember) / 0.12);
+    box-shadow:
+      0 1px 0 0 rgb(var(--ink) / 0.05) inset,
+      0 8px 32px -10px rgb(0 0 0 / 0.4);
+  }
+
+  /* 纸张噪点纹理：暗底 → 混合模式改成 overlay + 换成暖米白噪点 */
+  .grain::after {
+    mix-blend-mode: overlay;
+    opacity: 0.32;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.92 0 0 0 0 0.88 0 0 0 0 0.82 0 0 0 0.10 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* 纸张点阵纹理：暗底 → 点阵换成暖米白极低 alpha */
+  .paper-texture {
+    background-image:
+      radial-gradient(rgb(var(--ink) / 0.025) 1px, transparent 1px),
+      radial-gradient(rgb(var(--ink) / 0.015) 1px, transparent 1px);
+  }
+
+  /* 编辑主按钮：暗色下文字强制改成 ink（暖深色），避免和暗色 cream 背景糊在一起 */
+  .btn-primary {
+    color: rgb(var(--ink));
+  }
+
+  /* Reveal 入场：暗色稍微放大位移反差，更容易看见 */
+  .reveal {
+    transform: translateY(20px);
   }
 }
