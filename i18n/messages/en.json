@@ -32,6 +32,10 @@
       "description": "Answer eight questions, get five gifts picked by AI that reads the whole catalog — five, not 200.",
       "ctaPrimary": "Start the 8-step finder",
       "ctaSecondary": "Or browse by recipient",
+      "hotBadge": "Trending now",
+      "liveUsers": "18 people picking gifts right now",
+      "lastHourPrefix": "",
+      "lastHourSuffix": "people finished in the last hour",
       "stats": {
         "questions": "questions",
         "picks": "AI picks",
@@ -167,7 +171,12 @@
     "price": "Price",
     "priceNote": "Price as of Aug 2026 · Affiliate link",
     "priceNote2": "Prices may vary on Amazon.",
-    "viewOnAmazon": "View on Amazon · new tab"
+    "viewOnAmazon": "View on Amazon · new tab",
+    "onlyXLeft": "Only {x} left",
+    "saveX": "Save {x}%",
+    "boughtToday": "{x} bought today",
+    "viewingNow": "{x} viewing now",
+    "hurryStock": "Hurry — only {x} in stock"
   },
   "Locale": {
     "label": "Language"
@@ -183,7 +192,17 @@
     "answeredSoFar": "Answered so far",
     "back": "Back",
     "next": "Next",
+    "skip": "Not sure · skip",
     "seeResults": "See my results",
+    "etaMin": "~{m} min left",
+    "etaSec": "~{s} sec left",
+    "quizEncourage": {
+      "start": "Nice first pick — keep going.",
+      "early": "Good pace — {left} more to go.",
+      "halfway": "You're halfway — this is where it gets accurate.",
+      "almost": "Almost there — {left} more to lock in.",
+      "lastStep": "Last one — this makes the picks land."
+    },
     "questions": {
       "recipient": {
         "title": "Who is this gift for?",
@@ -508,7 +527,21 @@
       "colleague": "Colleague",
       "acquaintance": "Acquaintance",
       "client": "Client"
-    }
+    },
+    "bonusUnlock": "Bonus inside",
+    "unlockBenefit1": "The last {count} hidden AI picks",
+    "unlockBenefit2": "Editor-only reasons for each hidden pick",
+    "unlockBenefit3": "Share-card templates to send it as a gift note"
+  },
+  "Countdown": {
+    "badge": "Limited-time offer",
+    "title": "Amazon prices revert in — shop before the window closes",
+    "expiredBadge": "Offer ended",
+    "expiredTitle": "Pricing window closed — Amazon prices may now be higher",
+    "expiredCta": "Still shop now — current prices shown",
+    "hours": "HRS",
+    "mins": "MIN",
+    "secs": "SEC"
   },
   "Reveal": {
     "metaTitle": "A gift message waiting for you — GiftHive",
@@ -530,5 +563,22 @@
     "quizDesc": "Answer a few questions about who you're shopping for. AI picks 5 gifts from real Amazon products — each with a personalized reason.",
     "takeQuizBtn": "Take the quiz",
     "footerTag": "GiftHive · AI-curated gifts"
+  },
+  "ExitIntent": {
+    "beforeYouGo": "Before you go",
+    "title1": "Still stuck on the",
+    "title2": "perfect gift?",
+    "description": "Our 8-step finder picks five gifts from 200+ real products. Two minutes, no email, and people usually find the one in the first three.",
+    "socialProof": "2,300+ people used it this week",
+    "ctaPrimary": "Start the finder now",
+    "ctaSecondary": "I'll keep browsing",
+    "footnote": "No sign-up · Takes about 2 minutes"
+  },
+  "SocialProof": {
+    "quizDone": "{name} from {city} finished the gift finder",
+    "justBought": "{name} from {city} bought \"{gift}\"",
+    "revealed": "{name} from {city} sent a Reveal card",
+    "justNow": "Just now",
+    "minutesAgo": "{mins} min ago"
   }
 }

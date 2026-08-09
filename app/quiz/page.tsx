@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import QuizStep from "@/components/QuizStep";
+import ExitIntentModal from "@/components/ExitIntentModal";
 import { quizQuestions } from "@/lib/data";
 
 export const runtime = "edge";
@@ -59,6 +60,27 @@ const OPTION_DESC_KEYS: Record<string, Record<string, string>> = {
   },
 };
 
+// 跳过此题时使用的合理默认值（中位数人群 + 普适选项），保证跳过也能出结果
+const SKIP_DEFAULTS: Record<string, string> = {
+  recipient: "other",
+  age: "25-35",
+  occasion: "no-reason",
+  budget: "flexible",
+  interests: "",
+  personality: "practical",
+  giftStyle: "practical-item",
+  closeness: "close-friend",
+};
+
+// 不同阶段的鼓励微文案
+const ENCOURAGEMENT_BY_STEP: Record<number, string> = {
+  1: "quizEncourage.start",
+  3: "quizEncourage.early",
+  5: "quizEncourage.halfway",
+  7: "quizEncourage.almost",
+  8: "quizEncourage.lastStep",
+};
+
 export default function QuizPage() {
   const router = useRouter();
   const t = useTranslations("Quiz");
@@ -70,6 +92,19 @@ export default function QuizPage() {
 
   const question = quizQuestions[current - 1];
   const selected = answers[question.key];
+
+  // ETA 剩余时间：每题约 12 秒
+  const remainingSec = (total - current + 1) * 12;
+  const etaRemaining =
+    remainingSec >= 60
+      ? t("etaMin", { m: Math.max(1, Math.round(remainingSec / 60)) })
+      : t("etaSec", { s: remainingSec });
+
+  // 鼓励文案：按步骤映射，没有就 undefined
+  const encourageKey = ENCOURAGEMENT_BY_STEP[current];
+  const encouragement = encourageKey
+    ? t(encourageKey, { left: total - current + 1 })
+    : undefined;
 
   // Build translated question
   const qKey = question.key as keyof typeof OPTION_LABEL_KEYS;
@@ -106,6 +141,20 @@ export default function QuizPage() {
     }
   };
 
+  const handleSkip = () => {
+    // 写入合理默认值，直接进入下一题（保证即使用户跳过也能出高质量结果）
+    const def = SKIP_DEFAULTS[question.key];
+    if (def) {
+      setAnswers((prev) => ({ ...prev, [question.key]: def }));
+    }
+    setCustomTexts((prev) => ({ ...prev, [question.key]: "" }));
+    if (current < total) {
+      setCurrent((c) => c + 1);
+    } else {
+      handleNext(); // 最后一题 skip 等效于 next
+    }
+  };
+
   const handleNext = () => {
     if (current < total) {
       setCurrent((c) => c + 1);
@@ -130,15 +179,16 @@ export default function QuizPage() {
   };
 
   return (
-    <section className="relative overflow-hidden">
-      {/* Atmosphere */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute left-1/4 top-0 h-72 w-72 rounded-full bg-ember/10 blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 h-80 w-80 rounded-full bg-moss/10 blur-3xl" />
-        <div className="paper-texture absolute inset-0 opacity-60" />
-      </div>
+    <>
+      <section className="relative overflow-hidden">
+        {/* Atmosphere */}
+        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute left-1/4 top-0 h-72 w-72 rounded-full bg-ember/10 blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 h-80 w-80 rounded-full bg-moss/10 blur-3xl" />
+          <div className="paper-texture absolute inset-0 opacity-60" />
+        </div>
 
-      <div className="mx-auto max-w-7xl px-5 py-16 md:px-8 md:py-24">
+        <div className="mx-auto max-w-7xl px-5 py-16 md:px-8 md:py-24">
         {/* ============ Header ============ */}
         <div className="mx-auto mb-14 max-w-3xl text-center md:mb-20">
           <div className="flex items-center justify-center gap-3">
@@ -190,10 +240,14 @@ export default function QuizPage() {
             onSelect={handleSelect}
             onNext={handleNext}
             onBack={handleBack}
+            onSkip={handleSkip}
+            encouragement={encouragement}
+            etaRemaining={etaRemaining}
             labels={{
               back: t("back"),
               next: t("next"),
               seeResults: t("seeResults"),
+              skip: t("skip"),
             }}
             customText={customTexts[question.key] || ""}
             onCustomTextChange={handleCustomTextChange}
@@ -244,7 +298,11 @@ export default function QuizPage() {
             </div>
           </div>
         )}
-      </div>
-    </section>
+        </div>
+      </section>
+
+      {/* Quiz 中途退出挽留 */}
+      <ExitIntentModal />
+    </>
   );
 }

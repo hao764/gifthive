@@ -4,6 +4,8 @@ import GiftCard from "@/components/GiftCard";
 import HeroShowcase from "@/components/HeroShowcase";
 import Reveal from "@/components/Reveal";
 import Marquee from "@/components/Marquee";
+import ExitIntentModal from "@/components/ExitIntentModal";
+import SocialProofToast from "@/components/SocialProofToast";
 import { recipients, articles } from "@/lib/data";
 import {
   getEditorsPicksFallback,
@@ -91,7 +93,15 @@ export default async function HomePage() {
 
               <Reveal delay={240}>
                 <div className="mt-9 flex flex-wrap items-center gap-4">
-                  <Link href="/quiz" className="group btn-primary">
+                  <Link href="/quiz" className="group btn-primary relative overflow-hidden">
+                    {/* 紧迫感小徽章 */}
+                    <span className="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-cream/90 px-2 py-0.5 text-[0.56rem] font-semibold uppercase tracking-widest text-ember-deep shadow-soft">
+                      <span className="relative flex h-1.5 w-1.5">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-ember opacity-70" />
+                        <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-ember" />
+                      </span>
+                      {t("hero.hotBadge")}
+                    </span>
                     <span>{t("hero.ctaPrimary")}</span>
                     <span className="transition-transform duration-500 ease-editorial group-hover:translate-x-0.5">
                       →
@@ -106,6 +116,23 @@ export default async function HomePage() {
                       →
                     </span>
                   </Link>
+                </div>
+              </Reveal>
+
+              {/* CTA 下方的社会认同实时条 */}
+              <Reveal delay={280}>
+                <div className="mt-5 flex flex-wrap items-center gap-3 text-xs text-ink/50">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-ink/8 bg-cream-paper/50 px-3 py-1.5 glass">
+                    <span className="flex -space-x-1.5">
+                      <span className="h-4 w-4 rounded-full bg-ember/70 border-2 border-cream-paper" />
+                      <span className="h-4 w-4 rounded-full bg-moss/60 border-2 border-cream-paper" />
+                      <span className="h-4 w-4 rounded-full bg-ink/40 border-2 border-cream-paper" />
+                    </span>
+                    <span className="font-medium text-ink/65">{t("hero.liveUsers")}</span>
+                  </div>
+                  <span className="font-display italic text-ink/35">
+                    · {t("hero.lastHourPrefix")} {Math.floor(20 + Math.random() * 30)} {t("hero.lastHourSuffix")}
+                  </span>
                 </div>
               </Reveal>
 
@@ -456,6 +483,10 @@ export default async function HomePage() {
           </Reveal>
         </div>
       </section>
+
+      {/* 转化增强：退出挽留弹窗 + 社会认同浮窗 */}
+      <ExitIntentModal />
+      <SocialProofToast />
     </>
   );
 }

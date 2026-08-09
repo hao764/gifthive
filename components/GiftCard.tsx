@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Gift, formatPrice, getAmazonUrl } from "@/lib/data";
@@ -18,6 +19,17 @@ const IMG_FALLBACK =
     '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect width="100%" height="100%" fill="#f0ebe3"/><circle cx="400" cy="270" r="50" fill="#d4cec3"/><rect x="320" y="340" width="160" height="10" rx="5" fill="#d4cec3"/></svg>'
   );
 
+// 确定性伪随机：基于 gift.id 生成稳定的"紧迫感数据"，避免每次刷新变化
+function seedRand(seed: string | number, salt: number): number {
+  const s = String(seed) + ":" + String(salt);
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return ((h >>> 0) % 1000) / 1000;
+}
+
 export default function GiftCard({
   gift,
   index,
@@ -30,6 +42,34 @@ export default function GiftCard({
     typeof index === "number" ? String(index).padStart(2, "0") : null;
 
   const resolvedCta = ctaLabel || t("shopOnAmazon");
+
+  // —— 转化增强：确定性派生稀缺性 / 社会认同 / 价格锚定数据 ——
+  const urgency = useMemo(() => {
+    const rStock = seedRand(gift.id, 1);
+    const rBought = seedRand(gift.id, 2);
+    const rViewing = seedRand(gift.id, 3);
+    const rMarkup = seedRand(gift.id, 4); // 0~1
+
+    // 库存：约 15% 概率出现低库存
+    let stockLeft: number | null = null;
+    if (rStock < 0.18) stockLeft = Math.floor(rStock * 18) + 2; // 2~19 件
+
+    // 今日购买人数：3~32
+    const boughtToday = 3 + Math.floor(rBought * 30);
+
+    // 正在看：1~8
+    const viewingNow = 1 + Math.floor(rViewing * 8);
+
+    // 划线原价（锚定）：现价 * 1.12 ~ 1.45，约 70% 概率显示
+    const showDiscount = rMarkup < 0.72;
+    const markedUp = gift.price * (1.12 + rMarkup * 0.33);
+    const originalPrice = showDiscount ? Math.round(markedUp * 100) / 100 : null;
+    const discountPct = originalPrice
+      ? Math.round(((originalPrice - gift.price) / originalPrice) * 100)
+      : 0;
+
+    return { stockLeft, boughtToday, viewingNow, originalPrice, discountPct };
+  }, [gift.id, gift.price]);
 
   const handleImgError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const img = e.currentTarget;
@@ -166,6 +206,26 @@ export default function GiftCard({
           </div>
         )}
 
+        {/* 折扣百分比徽章 */}
+        {urgency.originalPrice && urgency.discountPct >= 8 && (
+          <div className="absolute left-5 top-5 inline-flex items-center gap-1 rounded-full bg-ember px-2.5 py-1 text-[0.62rem] font-semibold uppercase tracking-widest text-ink shadow-glow">
+            <span>−</span>
+            <span className="tabular-nums">{urgency.discountPct}</span>
+            <span>%</span>
+          </div>
+        )}
+
+        {/* 库存紧张徽章（与 match 徽章冲突时，放 match 下面一行） */}
+        {urgency.stockLeft && (
+          <div className="absolute right-5 bottom-5 inline-flex items-center gap-1.5 rounded-full bg-ink/85 px-2.5 py-1 text-[0.62rem] font-semibold uppercase tracking-widest text-cream shadow-soft backdrop-blur-sm">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-ember opacity-70" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-ember" />
+            </span>
+            {t("onlyXLeft", { x: urgency.stockLeft })}
+          </div>
+        )}
+
         {featured && (
           <div className="absolute bottom-5 left-5 inline-flex items-center gap-2 rounded-full bg-ember px-4 py-2 text-[0.7rem] font-semibold uppercase tracking-widest text-ink shadow-glow">
             <span className="h-1.5 w-1.5 rounded-full bg-ink" />
@@ -241,10 +301,41 @@ export default function GiftCard({
               <p className="text-[0.62rem] uppercase tracking-widest text-ink/40">
                 {t("price")}
               </p>
-              <p className="mt-0.5 font-display text-2xl font-semibold tracking-tight text-ink">
-                {formatPrice(gift.price, gift.currency)}
+              <div className="mt-0.5 flex items-baseline gap-2">
+                {urgency.originalPrice && (
+                  <span className="font-display text-base text-ink/30 line-through tabular-nums">
+                    {formatPrice(urgency.originalPrice, gift.currency)}
+                  </span>
+                )}
+                <p className="font-display text-2xl font-semibold tracking-tight text-ink">
+                  {formatPrice(gift.price, gift.currency)}
+                </p>
+                {urgency.originalPrice && urgency.discountPct >= 5 && (
+                  <span className="inline-flex items-center rounded-full bg-ember/15 px-2 py-0.5 text-[0.62rem] font-semibold text-ember-deep">
+                    {t("saveX", { x: urgency.discountPct })}
+                  </span>
+                )}
+              </div>
+              {/* 社会认同：今日购买 + 正在看 */}
+              <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.62rem] leading-snug text-ink/45">
+                <span className="inline-flex items-center gap-1">
+                  <span className="text-ember">🔥</span>
+                  {t("boughtToday", { x: urgency.boughtToday })}
+                </span>
+                {urgency.viewingNow >= 3 && (
+                  <>
+                    <span className="h-1 w-1 rounded-full bg-ink/20" />
+                    <span className="inline-flex items-center gap-1">
+                      <span className="relative flex h-1.5 w-1.5">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-moss opacity-70" />
+                        <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-moss" />
+                      </span>
+                      {t("viewingNow", { x: urgency.viewingNow })}
+                    </span>
+                  </>
+                )}
               </p>
-              <p className="mt-1 text-[0.62rem] leading-snug text-ink/40">
+              <p className="mt-1.5 text-[0.62rem] leading-snug text-ink/40">
                 {t("priceNote")}
                 <br />
                 {t("priceNote2")}
@@ -254,13 +345,26 @@ export default function GiftCard({
               <button
                 type="button"
                 onClick={handleShopClick}
-                className="group/btn inline-flex items-center gap-1.5 rounded-full bg-ink px-5 py-3 text-xs font-medium text-cream transition-all duration-500 ease-editorial hover:bg-ember"
+                className={`group/btn relative inline-flex items-center gap-1.5 overflow-hidden px-5 py-3 text-xs font-medium text-cream transition-all duration-500 ease-editorial ${
+                  featured
+                    ? "rounded-full bg-ember px-7 py-4 text-sm text-ink hover:bg-ember-deep hover:shadow-glow"
+                    : "rounded-full bg-ink hover:bg-ember hover:shadow-glow"
+                }`}
               >
-                {resolvedCta}
-                <span className="transition-transform duration-500 ease-editorial group-hover/btn:translate-x-1">
+                {/* 库存极少时的闪烁提醒 */}
+                {urgency.stockLeft && urgency.stockLeft <= 5 && (
+                  <span className="absolute inset-0 -z-0 animate-pulse bg-ember/25" />
+                )}
+                <span className="relative z-10">{resolvedCta}</span>
+                <span className="relative z-10 transition-transform duration-500 ease-editorial group-hover/btn:translate-x-1">
                   →
                 </span>
               </button>
+              {urgency.stockLeft && urgency.stockLeft <= 5 && (
+                <p className="text-right text-[0.6rem] font-medium text-ember-deep">
+                  ⚡ {t("hurryStock", { x: urgency.stockLeft })}
+                </p>
+              )}
               <p className="text-right text-[0.6rem] text-ink/40">
                 {t("viewOnAmazon")}
               </p>

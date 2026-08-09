@@ -9,6 +9,8 @@ import Reveal from "@/components/Reveal";
 import ShareBar from "@/components/ShareBar";
 import ShareCardButton from "@/components/ShareCardButton";
 import RevealModal from "@/components/RevealModal";
+import CountdownBar from "@/components/CountdownBar";
+import SocialProofToast from "@/components/SocialProofToast";
 import type { AIGift } from "@/lib/deepseek";
 
 const SHARE_UNLOCK_KEY = "gifthive:share_unlocked";
@@ -83,7 +85,7 @@ function ResultContent({ initialGifts, aiUsed, totalCandidates }: Props) {
       })()
     : t("aSpecialDay");
 
-  // Share-to-unlock: top 2 picks are always visible, the rest are gated.
+  // Share-to-unlock: 降低门槛，top 3 始终可见，只锁最后 2 个（提高用户看到内容的概率）
   const [unlocked, setUnlocked] = useState(false);
   const [showRevealModal, setShowRevealModal] = useState(false);
   useEffect(() => {
@@ -106,9 +108,13 @@ function ResultContent({ initialGifts, aiUsed, totalCandidates }: Props) {
     }
   };
 
-  const hasLockedPicks = gifts.length > 2 && !unlocked;
-  const visibleRest = hasLockedPicks ? gifts.slice(1, 2) : gifts.slice(1, 5);
-  const lockedPicks = hasLockedPicks ? gifts.slice(2, 5) : [];
+  // 降低门槛：解锁 3 个，只锁 2 个（比之前多出 1 个可见礼物，提高转化）
+  const UNLOCKED_COUNT = 3;
+  const hasLockedPicks = gifts.length > UNLOCKED_COUNT && !unlocked;
+  const visibleRest = hasLockedPicks
+    ? gifts.slice(1, UNLOCKED_COUNT)
+    : gifts.slice(1, 5);
+  const lockedPicks = hasLockedPicks ? gifts.slice(UNLOCKED_COUNT, 5) : [];
 
   return (
     <section className="relative overflow-hidden">
@@ -196,6 +202,11 @@ function ResultContent({ initialGifts, aiUsed, totalCandidates }: Props) {
 
         {featured ? (
           <div className="grid gap-5 md:grid-cols-2">
+            {/* 限时优惠倒计时横幅 */}
+            <Reveal className="md:col-span-2">
+              <CountdownBar />
+            </Reveal>
+
             <Reveal className="md:col-span-2">
               <GiftCard gift={featured} index={1} featured ctaLabel={t("shopNow")} />
             </Reveal>
@@ -216,13 +227,16 @@ function ResultContent({ initialGifts, aiUsed, totalCandidates }: Props) {
                       className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-ember/15 blur-3xl"
                     />
                     <div className="relative flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
-                      <div className="max-w-md">
+                      <div className="max-w-lg">
                         <div className="flex items-center gap-2">
                           <span className="font-display text-xs italic text-ember-deep">
                             §
                           </span>
                           <span className="text-[0.62rem] font-semibold uppercase tracking-widest text-ember-deep">
                             {t("lockedPicks", { count: lockedPicks.length })}
+                          </span>
+                          <span className="inline-flex items-center gap-1 rounded-full bg-ember/15 px-2 py-0.5 text-[0.6rem] font-semibold text-ember-deep">
+                            🎁 {t("bonusUnlock")}
                           </span>
                         </div>
                         <h3 className="mt-3 font-display text-2xl font-semibold leading-tight tracking-tighter text-ink md:text-3xl">
@@ -235,6 +249,20 @@ function ResultContent({ initialGifts, aiUsed, totalCandidates }: Props) {
                         <p className="mt-2 text-pretty text-sm leading-relaxed text-ink/60">
                           {t("lockedDesc")}
                         </p>
+                        <ul className="mt-4 space-y-1.5 text-xs text-ink/60">
+                          <li className="flex items-start gap-2">
+                            <span className="text-ember">✓</span>
+                            {t("unlockBenefit1", { count: lockedPicks.length })}
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-ember">✓</span>
+                            {t("unlockBenefit2")}
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-ember">✓</span>
+                            {t("unlockBenefit3")}
+                          </li>
+                        </ul>
                       </div>
                       <div className="flex flex-col gap-3">
                         <ShareBar onShare={handleShare} />
@@ -351,6 +379,9 @@ function ResultContent({ initialGifts, aiUsed, totalCandidates }: Props) {
           onClose={() => setShowRevealModal(false)}
         />
       )}
+
+      {/* 转化增强：社会认同浮窗 */}
+      <SocialProofToast />
     </section>
   );
 }

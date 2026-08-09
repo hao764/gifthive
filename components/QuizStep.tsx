@@ -10,11 +10,15 @@ type Props = {
   onSelect: (value: string) => void;
   onNext: () => void;
   onBack: () => void;
+  onSkip?: () => void;
   labels: {
     back: string;
     next: string;
     seeResults: string;
+    skip?: string;
   };
+  encouragement?: string;
+  etaRemaining?: string;
   customText?: string;
   onCustomTextChange?: (text: string) => void;
   customLabel?: string;
@@ -29,7 +33,10 @@ export default function QuizStep({
   onSelect,
   onNext,
   onBack,
+  onSkip,
   labels,
+  encouragement,
+  etaRemaining,
   customText = "",
   onCustomTextChange,
   customLabel = "Or describe in your own words",
@@ -39,6 +46,7 @@ export default function QuizStep({
   const isLast = current === total;
   const hasCustom = customText.trim().length > 0;
   const canProceed = Boolean(selected) || hasCustom;
+  const canSkip = Boolean(onSkip) && !isLast;
 
   return (
     <div className="animate-fade-in mx-auto w-full max-w-3xl">
@@ -54,9 +62,17 @@ export default function QuizStep({
               {String(total).padStart(2, "0")}
             </span>
           </div>
-          <span className="font-display text-sm italic text-ink/45">
-            {progress}%
-          </span>
+          <div className="flex flex-col items-end gap-1">
+            <span className="font-display text-sm italic text-ink/45">
+              {progress}%
+            </span>
+            {etaRemaining && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-ink/5 px-2.5 py-1 text-[0.62rem] font-medium text-ink/45">
+                <span>⏱</span>
+                {etaRemaining}
+              </span>
+            )}
+          </div>
         </div>
         <div className="mt-3 h-[2px] w-full overflow-hidden rounded-full bg-ink/8">
           <div
@@ -64,6 +80,14 @@ export default function QuizStep({
             style={{ width: `${progress}%` }}
           />
         </div>
+        {encouragement && (
+          <div className="mt-4 flex items-center gap-2 text-[0.68rem] font-medium text-ember-deep">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-ember/15 text-[0.7rem]">
+              ✦
+            </span>
+            <span className="font-display italic">{encouragement}</span>
+          </div>
+        )}
       </div>
 
       {/* ============ Question ============ */}
@@ -199,17 +223,31 @@ export default function QuizStep({
           {labels.back}
         </button>
 
-        <button
-          type="button"
-          onClick={onNext}
-          disabled={!canProceed}
-          className="group inline-flex items-center gap-2 overflow-hidden rounded-full bg-ink px-7 py-3.5 text-sm font-medium text-cream transition-all duration-500 ease-editorial hover:bg-ember disabled:cursor-not-allowed disabled:bg-ink/25"
-        >
-          <span>{isLast ? labels.seeResults : labels.next}</span>
-          <span className="transition-transform duration-500 ease-editorial group-hover:translate-x-0.5">
-            →
-          </span>
-        </button>
+        <div className="flex items-center gap-3">
+          {canSkip && (
+            <button
+              type="button"
+              onClick={onSkip}
+              className="group inline-flex items-center gap-1.5 rounded-full border border-ink/10 px-4 py-2.5 text-xs font-medium text-ink/45 transition-all duration-500 ease-editorial hover:border-ink/25 hover:text-ink/65"
+            >
+              {labels.skip || "Skip"}
+              <span className="text-[0.8rem] opacity-50 group-hover:opacity-100">
+                ⏭
+              </span>
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={onNext}
+            disabled={!canProceed && !canSkip}
+            className="group inline-flex items-center gap-2 overflow-hidden rounded-full bg-ink px-7 py-3.5 text-sm font-medium text-cream transition-all duration-500 ease-editorial hover:bg-ember disabled:cursor-not-allowed disabled:bg-ink/25"
+          >
+            <span>{isLast ? labels.seeResults : labels.next}</span>
+            <span className="transition-transform duration-500 ease-editorial group-hover:translate-x-0.5">
+              →
+            </span>
+          </button>
+        </div>
       </div>
     </div>
   );

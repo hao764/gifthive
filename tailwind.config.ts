@@ -85,6 +85,14 @@ const config: Config = {
           "0%": { transform: "scaleX(0)" },
           "100%": { transform: "scaleX(1)" },
         },
+        "slide-up-left": {
+          "0%": { opacity: "0", transform: "translateY(24px) translateX(-12px)" },
+          "100%": { opacity: "1", transform: "translateY(0) translateX(0)" },
+        },
+        "soft-pulse": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.72", transform: "scale(1.02)" },
+        },
       },
       animation: {
         "fade-up": "fade-up 0.9s cubic-bezier(0.16,1,0.3,1) both",
@@ -94,6 +102,8 @@ const config: Config = {
         shimmer: "shimmer 3s linear infinite",
         "float-slow": "float-slow 7s ease-in-out infinite",
         "draw-line": "draw-line 1.2s cubic-bezier(0.16,1,0.3,1) both",
+        "slide-up-left": "slide-up-left 0.5s cubic-bezier(0.16,1,0.3,1) both",
+        "soft-pulse": "soft-pulse 1.2s ease-in-out infinite",
       },
     },
   },
