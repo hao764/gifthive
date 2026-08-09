@@ -32,6 +32,10 @@
       "description": "回答八个问题，AI 浏览全部目录为你挑选五件礼物 —— 五件，不是两百件",
       "ctaPrimary": "开始八步推荐",
       "ctaSecondary": "或按收件人浏览",
+      "hotBadge": "正在热门",
+      "liveUsers": "此刻 18 人正在挑礼物",
+      "lastHourPrefix": "· 过去 1 小时内",
+      "lastHourSuffix": "人完成了推荐",
       "stats": {
         "questions": "问题",
         "picks": "AI 推荐",
@@ -167,7 +171,12 @@
     "price": "价格",
     "priceNote": "价格截至2026年8月 · 联盟链接",
     "priceNote2": "亚马逊价格可能会有变动",
-    "viewOnAmazon": "在亚马逊查看 · 新标签页打开"
+    "viewOnAmazon": "在亚马逊查看 · 新标签页打开",
+    "onlyXLeft": "仅剩 {x} 件",
+    "saveX": "省 {x}%",
+    "boughtToday": "今日 {x} 人购买",
+    "viewingNow": "{x} 人正在看",
+    "hurryStock": "立即行动 · 仅剩 {x} 件库存"
   },
   "Locale": {
     "label": "语言"
@@ -183,7 +192,17 @@
     "answeredSoFar": "已回答",
     "back": "上一步",
     "next": "下一步",
+    "skip": "不太确定 · 跳过",
     "seeResults": "查看结果",
+    "etaMin": "还剩约 {m} 分钟",
+    "etaSec": "还剩约 {s} 秒",
+    "quizEncourage": {
+      "start": "很好的开始，继续保持。",
+      "early": "节奏不错 —— 还剩 {left} 题。",
+      "halfway": "已经完成一半 —— 从这里开始推荐会越来越准。",
+      "almost": "快要结束啦 —— 还有 {left} 题就锁定结果。",
+      "lastStep": "最后一题 —— 答完即刻揭晓推荐。"
+    },
     "questions": {
       "recipient": {
         "title": "这件礼物送给谁？",
@@ -508,7 +527,38 @@
       "colleague": "同事",
       "acquaintance": "熟人",
       "client": "客户"
-    }
+    },
+    "bonusUnlock": "内含额外福利",
+    "unlockBenefit1": "查看最后 {count} 个隐藏 AI 推荐",
+    "unlockBenefit2": "编辑为每个隐藏推荐撰写的专属推荐理由",
+    "unlockBenefit3": "附赠贺卡模板 — 一键转成送礼留言卡"
+  },
+  "Countdown": {
+    "badge": "限时优惠",
+    "title": "亚马逊价格将在下方时间后恢复原价 — 请在此窗口前下单",
+    "expiredBadge": "活动已结束",
+    "expiredTitle": "价格窗口已关闭，亚马逊当前价格可能已上浮",
+    "expiredCta": "仍可立即下单 · 以当前页面价格为准",
+    "hours": "时",
+    "mins": "分",
+    "secs": "秒"
+  },
+  "ExitIntent": {
+    "beforeYouGo": "你确定要离开吗？",
+    "title1": "还在为",
+    "title2": "送什么礼物纠结？",
+    "description": "我们的 8 步推荐器会从 200+ 件真实商品中挑选 5 件最贴合的礼物。仅需 2 分钟，无需留邮箱，80% 的人在前 3 件里就能找到想要的。",
+    "socialProof": "本周已有 2,300+ 人使用了推荐器",
+    "ctaPrimary": "现在就开始推荐",
+    "ctaSecondary": "我再看看",
+    "footnote": "无需注册 · 全程约 2 分钟"
+  },
+  "SocialProof": {
+    "quizDone": "来自 {city} 的 {name} 刚完成了礼物推荐",
+    "justBought": "来自 {city} 的 {name} 购买了「{gift}」",
+    "revealed": "来自 {city} 的 {name} 发送了一张 Reveal 贺卡",
+    "justNow": "刚刚",
+    "minutesAgo": "{mins} 分钟前"
   },
   "Reveal": {
     "metaTitle": "一份等待你的礼物留言 — GiftHive",

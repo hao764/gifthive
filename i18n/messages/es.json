@@ -32,6 +32,10 @@
       "description": "Responde ocho preguntas, recibe cinco regalos seleccionados por IA que lee todo el catálogo — cinco, no 200",
       "ctaPrimary": "Iniciar el buscador de 8 pasos",
       "ctaSecondary": "O navegar por destinatario",
+      "hotBadge": "En tendencia",
+      "liveUsers": "18 personas eligiendo regalos ahora mismo",
+      "lastHourPrefix": "· En la última hora",
+      "lastHourSuffix": "personas terminaron el buscador",
       "stats": {
         "questions": "preguntas",
         "picks": "selecciones IA",
@@ -160,14 +164,19 @@
     "from": "de",
     "match": "coincidencia",
     "locked": "Bloqueado",
-    "shareToReveal": "Comparte para ver",
+    "shareToReveal": "Compartir para revelar",
     "editorsPick": "Selección del editor",
     "aiSays": "La IA dice",
     "whyThisOne": "Por qué este",
     "price": "Precio",
-    "priceNote": "Precio a agosto de 2026 · Enlace de afiliado",
-    "priceNote2": "Los precios pueden variar en Amazon",
-    "viewOnAmazon": "Ver en Amazon · nueva pestaña"
+    "priceNote": "Precio a agosto de 2026 · Enlace afiliado",
+    "priceNote2": "Los precios en Amazon pueden variar.",
+    "viewOnAmazon": "Ver en Amazon · pestaña nueva",
+    "onlyXLeft": "Solo quedan {x}",
+    "saveX": "Ahorra {x}%",
+    "boughtToday": "{x} lo compraron hoy",
+    "viewingNow": "{x} lo están viendo ahora",
+    "hurryStock": "Date prisa — solo {x} en stock"
   },
   "Locale": {
     "label": "Idioma"
@@ -183,7 +192,17 @@
     "answeredSoFar": "Respondidas hasta ahora",
     "back": "Atrás",
     "next": "Siguiente",
+    "skip": "No estoy seguro · saltar",
     "seeResults": "Ver mis resultados",
+    "etaMin": "~{m} min restantes",
+    "etaSec": "~{s} seg restantes",
+    "quizEncourage": {
+      "start": "Buen primer paso — sigue así.",
+      "early": "Buen ritmo — faltan {left}.",
+      "halfway": "Vas por la mitad — aquí se vuelve más preciso.",
+      "almost": "Casi terminas — {left} más y queda bloqueado.",
+      "lastStep": "Último paso — este es el que define las selecciones."
+    },
     "questions": {
       "recipient": {
         "title": "¿Para quién es este regalo?",
@@ -468,11 +487,42 @@
       "playful": "Juguetón",
       "partner": "Pareja",
       "family": "Familia",
-      "closeFriend": "Amigo cercano",
-      "colleague": "Colega",
-      "acquaintance": "Conocido",
+      "closeFriend": "Amigo/a íntimo/a",
+      "colleague": "Compañero/a de trabajo",
+      "acquaintance": "Conocido/a",
       "client": "Cliente"
-    }
+    },
+    "bonusUnlock": "Con beneficios extra",
+    "unlockBenefit1": "Desbloquea los últimos {count} regalos ocultos de la IA",
+    "unlockBenefit2": "Exclusivas razones editoriales para cada regalo oculto",
+    "unlockBenefit3": "Plantillas de tarjeta — envíalas como nota de regalo en un clic"
+  },
+  "Countdown": {
+    "badge": "Oferta por tiempo limitado",
+    "title": "Los precios de Amazon vuelven al valor original — compra antes de que se acabe",
+    "expiredBadge": "Oferta terminada",
+    "expiredTitle": "Ventana de precios cerrada — los precios actuales en Amazon podrían ser más altos",
+    "expiredCta": "Comprar ahora igualmente · se muestran los precios vigentes",
+    "hours": "HORAS",
+    "mins": "MIN",
+    "secs": "SEG"
+  },
+  "ExitIntent": {
+    "beforeYouGo": "Antes de que te vayas",
+    "title1": "¿Sigues dudando con",
+    "title2": "el regalo perfecto?",
+    "description": "Nuestro buscador de 8 pasos elige cinco regalos entre 200+ productos reales. Dos minutos, sin pedir correo, y el 80% encuentra el ideal entre los tres primeros.",
+    "socialProof": "Más de 2.300 personas lo usaron esta semana",
+    "ctaPrimary": "Iniciar el buscador ahora",
+    "ctaSecondary": "Vuelvo a navegar un poco",
+    "footnote": "Sin registro · dura unos 2 minutos"
+  },
+  "SocialProof": {
+    "quizDone": "{name} de {city} terminó el buscador de regalos",
+    "justBought": "{name} de {city} compró «{gift}»",
+    "revealed": "{name} de {city} envió una tarjeta Reveal",
+    "justNow": "Ahora mismo",
+    "minutesAgo": "hace {mins} min"
   },
   "Reveal": {
     "metaTitle": "Un mensaje de regalo te espera — GiftHive",

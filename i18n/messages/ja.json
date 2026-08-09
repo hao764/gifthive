@@ -32,6 +32,10 @@
       "description": "8つの質問に答えると、AIがカタログ全体から5つのギフトを選びます — 200件ではなく、5件です",
       "ctaPrimary": "8ステップのファインダーを開始",
       "ctaSecondary": "または 相手別に閲覧",
+      "hotBadge": "今話題",
+      "liveUsers": "現在 18 人がギフトを選んでいます",
+      "lastHourPrefix": "・ 過去1時間で",
+      "lastHourSuffix": "人が診断を完了しました",
       "stats": {
         "questions": "質問",
         "picks": "AIおすすめ",
@@ -167,7 +171,12 @@
     "price": "価格",
     "priceNote": "2026年8月時点の価格 · アフィリエイトリンク",
     "priceNote2": "Amazonでの価格は変動する場合があります",
-    "viewOnAmazon": "Amazonで見る · 新しいタブ"
+    "viewOnAmazon": "Amazonで見る · 新しいタブ",
+    "onlyXLeft": "残り {x} 点",
+    "saveX": "{x}% OFF",
+    "boughtToday": "本日 {x} 人が購入",
+    "viewingNow": "{x} 人が閲覧中",
+    "hurryStock": "お急ぎください · 残り在庫 {x} 点"
   },
   "Locale": {
     "label": "言語"
@@ -183,7 +192,17 @@
     "answeredSoFar": "これまでに回答した数",
     "back": "戻る",
     "next": "次へ",
+    "skip": "わからない · スキップ",
     "seeResults": "結果を見る",
+    "etaMin": "残り 約 {m} 分",
+    "etaSec": "残り 約 {s} 秒",
+    "quizEncourage": {
+      "start": "いいスタートです。その調子で。",
+      "early": "いいペースです — あと {left} 問です。",
+      "halfway": "半分まで来ました — ここから精度が上がります。",
+      "almost": "もう少し — あと {left} 問で結果が確定します。",
+      "lastStep": "最後の1問 — 答えたらすぐに結果をお届けします。"
+    },
     "questions": {
       "recipient": {
         "title": "このギフトは誰へのプレゼントですか？",
@@ -472,7 +491,38 @@
       "colleague": "同僚",
       "acquaintance": "知人",
       "client": "クライアント"
-    }
+    },
+    "bonusUnlock": "特典付き",
+    "unlockBenefit1": "残り {count} つの隠れたAIおすすめを見る",
+    "unlockBenefit2": "編集者が書き下ろした、各隠れおすすめの専用推薦コメント",
+    "unlockBenefit3": "ギフトカードテンプレート — そのままメッセージカードとして送信"
+  },
+  "Countdown": {
+    "badge": "期間限定特価",
+    "title": "Amazonの通常価格に戻るまで — このウィンドウ内でお買い求めください",
+    "expiredBadge": "期間終了",
+    "expiredTitle": "価格据え置き期間が終了しました。Amazonでの現在価格は上昇している場合があります",
+    "expiredCta": "今すぐ購入する · 表示中の現在価格が適用されます",
+    "hours": "時間",
+    "mins": "分",
+    "secs": "秒"
+  },
+  "ExitIntent": {
+    "beforeYouGo": "お帰りになる前に",
+    "title1": "まだ",
+    "title2": "プレゼントで迷っていますか？",
+    "description": "8ステップのファインダーなら、200点以上の実在商品から5つのギフトをAIがピックアップ。約2分、メール不要で、8割の方が最初の3点の中で気に入るものを見つけています。",
+    "socialProof": "今週はすでに 2,300 人以上が利用中",
+    "ctaPrimary": "今すぐファインダーを始める",
+    "ctaSecondary": "もう少し見てみる",
+    "footnote": "登録不要 · 所要時間 約2分"
+  },
+  "SocialProof": {
+    "quizDone": "{city}在住の {name} さんがギフト診断を完了しました",
+    "justBought": "{city}在住の {name} さんが「{gift}」を購入しました",
+    "revealed": "{city}在住の {name} さんがRevealカードを送信しました",
+    "justNow": "たった今",
+    "minutesAgo": "{mins}分前"
   },
   "Reveal": {
     "metaTitle": "あなたを待つギフトメッセージ — GiftHive",

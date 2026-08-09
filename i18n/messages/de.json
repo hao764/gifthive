@@ -32,6 +32,10 @@
       "description": "Beantworte acht Fragen, erhalte fünf Geschenke von einer KI, die den gesamten Katalog liest — fünf, nicht 200",
       "ctaPrimary": "8-Schritte-Finder starten",
       "ctaSecondary": "Oder nach Empfänger browsen",
+      "hotBadge": "Gerade im Trend",
+      "liveUsers": "18 Personen wählen jetzt gerade Geschenke",
+      "lastHourPrefix": "· In der letzten Stunde",
+      "lastHourSuffix": "Personen haben den Finder abgeschlossen",
       "stats": {
         "questions": "Fragen",
         "picks": "KI-Auswahl",
@@ -156,18 +160,23 @@
     }
   },
   "GiftCard": {
-    "shopOnAmazon": "Bei Amazon kaufen",
+    "shopOnAmazon": "Auf Amazon kaufen",
     "from": "von",
     "match": "Übereinstimmung",
     "locked": "Gesperrt",
-    "shareToReveal": "Teilen um zu sehen",
-    "editorsPick": "Editor's Pick",
+    "shareToReveal": "Teilen zum Anzeigen",
+    "editorsPick": "Redaktionsempfehlung",
     "aiSays": "KI sagt",
-    "whyThisOne": "Warum dieses",
+    "whyThisOne": "Warum genau dieses",
     "price": "Preis",
-    "priceNote": "Preis Stand August 2026 · Affiliate-Link",
-    "priceNote2": "Preise auf Amazon können variieren",
-    "viewOnAmazon": "Auf Amazon ansehen · neuer Tab"
+    "priceNote": "Preis Stand Aug 2026 · Affiliate-Link",
+    "priceNote2": "Preise auf Amazon können abweichen.",
+    "viewOnAmazon": "Auf Amazon ansehen · neuer Tab",
+    "onlyXLeft": "Nur noch {x} verfügbar",
+    "saveX": "-{x}% sparen",
+    "boughtToday": "{x} heute gekauft",
+    "viewingNow": "{x} sehen es sich jetzt an",
+    "hurryStock": "Schnell — nur noch {x} auf Lager"
   },
   "Locale": {
     "label": "Sprache"
@@ -183,7 +192,17 @@
     "answeredSoFar": "Bisher beantwortet",
     "back": "Zurück",
     "next": "Weiter",
-    "seeResults": "Ergebnisse ansehen",
+    "skip": "Nicht sicher · überspringen",
+    "seeResults": "Meine Ergebnisse ansehen",
+    "etaMin": "~{m} Min. übrig",
+    "etaSec": "~{s} Sek. übrig",
+    "quizEncourage": {
+      "start": "Guter erster Zug — weiter so.",
+      "early": "Gutes Tempo — noch {left} übrig.",
+      "halfway": "Du bist auf der Hälfte — hier wird es genau.",
+      "almost": "Fast geschafft — noch {left}, dann ist es fix.",
+      "lastStep": "Letzter Schritt — hier werden die Vorschläge richtig."
+    },
     "questions": {
       "recipient": {
         "title": "Für wen ist dieses Geschenk?",
@@ -466,13 +485,44 @@
       "romantic": "Romantisch",
       "minimal": "Minimalistisch",
       "playful": "Verspielt",
-      "partner": "Partner",
+      "partner": "Partner:in",
       "family": "Familie",
-      "closeFriend": "Enger Freund",
-      "colleague": "Kollege",
-      "acquaintance": "Bekannter",
+      "closeFriend": "Enger Freund / enge Freundin",
+      "colleague": "Kolleg:in",
+      "acquaintance": "Bekannte:r",
       "client": "Kunde"
-    }
+    },
+    "bonusUnlock": "Extra-Bonus enthalten",
+    "unlockBenefit1": "Die letzten {count} versteckten KI-Vorschläge entsperren",
+    "unlockBenefit2": "Redaktionelle Begründung zu jedem versteckten Vorschlag",
+    "unlockBenefit3": "Geschenkkarten-Vorlagen — direkt als Grußkarte verschicken"
+  },
+  "Countdown": {
+    "badge": "Zeitlich begrenztes Angebot",
+    "title": "Amazon-Preise kehren gleich zum Normalzustand zurück — jetzt noch kaufen",
+    "expiredBadge": "Angebot abgelaufen",
+    "expiredTitle": "Preisfenster geschlossen — Amazon-Preise können jetzt höher sein",
+    "expiredCta": "Trotzdem jetzt kaufen · gültige Preise werden angezeigt",
+    "hours": "STD",
+    "mins": "MIN",
+    "secs": "SEK"
+  },
+  "ExitIntent": {
+    "beforeYouGo": "Bevor du gehst",
+    "title1": "Immer noch auf der Suche nach",
+    "title2": "dem perfekten Geschenk?",
+    "description": "Unser 8-Schritte-Finder wählt fünf Geschenke aus 200+ echten Produkten. Zwei Minuten, keine E-Mail nötig — die meisten finden schon unter den ersten dreien das Passende.",
+    "socialProof": "2.300+ haben es diese Woche benutzt",
+    "ctaPrimary": "Finder jetzt starten",
+    "ctaSecondary": "Ich bleibe noch auf der Seite",
+    "footnote": "Keine Anmeldung · Dauer: ca. 2 Minuten"
+  },
+  "SocialProof": {
+    "quizDone": "{name} aus {city} hat den Geschenkfinder abgeschlossen",
+    "justBought": "{name} aus {city} hat „{gift}“ gekauft",
+    "revealed": "{name} aus {city} hat eine Reveal-Karte verschickt",
+    "justNow": "Gerade eben",
+    "minutesAgo": "vor {mins} Min."
   },
   "Reveal": {
     "metaTitle": "Eine Geschenk-Nachricht wartet auf dich — GiftHive",
