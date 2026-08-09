@@ -192,6 +192,15 @@ export default function GiftCard({
           </div>
         )}
 
+        {/* 🔥 折扣徽章：从 top-5 下移到 top-14，避免和 N° 索引徽章（left-5 top-5）重叠 */}
+        {urgency.originalPrice && urgency.discountPct >= 8 && (
+          <div className="absolute left-5 top-14 inline-flex items-center gap-1 rounded-full bg-ember px-2.5 py-1 text-[0.62rem] font-semibold uppercase tracking-widest text-ink shadow-glow">
+            <span>−</span>
+            <span className="tabular-nums">{urgency.discountPct}</span>
+            <span>%</span>
+          </div>
+        )}
+
         {gift.match > 0 && (
           <div className="absolute right-5 top-5 flex items-center gap-2 rounded-full bg-ink/85 px-3 py-1.5 text-[0.68rem] font-medium text-cream shadow-soft backdrop-blur-sm">
             {gift.aiMatchScore !== undefined && (
@@ -206,18 +215,13 @@ export default function GiftCard({
           </div>
         )}
 
-        {/* 折扣百分比徽章 */}
-        {urgency.originalPrice && urgency.discountPct >= 8 && (
-          <div className="absolute left-5 top-5 inline-flex items-center gap-1 rounded-full bg-ember px-2.5 py-1 text-[0.62rem] font-semibold uppercase tracking-widest text-ink shadow-glow">
-            <span>−</span>
-            <span className="tabular-nums">{urgency.discountPct}</span>
-            <span>%</span>
-          </div>
-        )}
-
-        {/* 库存紧张徽章（与 match 徽章冲突时，放 match 下面一行） */}
+        {/* Editor's Pick 必须和 Only X left 不冲突：Featured 时，把 Only X left 挪到右中（右5，垂直中间） */}
         {urgency.stockLeft && (
-          <div className="absolute right-5 bottom-5 inline-flex items-center gap-1.5 rounded-full bg-ink/85 px-2.5 py-1 text-[0.62rem] font-semibold uppercase tracking-widest text-cream shadow-soft backdrop-blur-sm">
+          <div
+            className={`absolute inline-flex items-center gap-1.5 rounded-full bg-ink/85 px-2.5 py-1 text-[0.62rem] font-semibold uppercase tracking-widest text-cream shadow-soft backdrop-blur-sm ${
+              featured ? "right-5 top-1/2 -translate-y-1/2" : "right-5 bottom-5"
+            }`}
+          >
             <span className="relative flex h-1.5 w-1.5">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-ember opacity-70" />
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-ember" />

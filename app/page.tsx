@@ -93,20 +93,22 @@ export default async function HomePage() {
 
               <Reveal delay={240}>
                 <div className="mt-9 flex flex-wrap items-center gap-4">
-                  <Link href="/quiz" className="group btn-primary relative overflow-hidden">
-                    {/* 紧迫感小徽章 */}
-                    <span className="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-cream/90 px-2 py-0.5 text-[0.56rem] font-semibold uppercase tracking-widest text-ember-deep shadow-soft">
+                  <div className="group relative inline-flex items-stretch">
+                    <Link href="/quiz" className="group/btn inline-flex items-center gap-2 rounded-full bg-ember px-7 py-3.5 pr-5 text-sm font-medium text-ink transition-all duration-500 ease-editorial hover:bg-ember-deep hover:shadow-glow">
+                      <span>{t("hero.ctaPrimary")}</span>
+                      <span className="transition-transform duration-500 ease-editorial group-hover:translate-x-0.5">
+                        →
+                      </span>
+                    </Link>
+                    {/* 🔥 徽章：移到按钮右侧外部，垂直居中，不再压按钮内容 */}
+                    <span className="pointer-events-none relative ml-2 hidden items-center gap-1 self-center rounded-full bg-ink/85 px-2.5 py-1 text-[0.56rem] font-semibold uppercase tracking-widest text-cream shadow-soft sm:inline-flex">
                       <span className="relative flex h-1.5 w-1.5">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-ember opacity-70" />
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-ember opacity-80" />
                         <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-ember" />
                       </span>
                       {t("hero.hotBadge")}
                     </span>
-                    <span>{t("hero.ctaPrimary")}</span>
-                    <span className="transition-transform duration-500 ease-editorial group-hover:translate-x-0.5">
-                      →
-                    </span>
-                  </Link>
+                  </div>
                   <Link
                     href="/for-him"
                     className="group inline-flex items-center gap-2 text-sm font-medium text-ink/70 transition-colors hover:text-ink"
