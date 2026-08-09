@@ -2,17 +2,82 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   🎨 主题色变量（浅色 / 暗色 双模式）
+   暗色风格参照 OPPO Find X8 (ColorOS) 浏览器暗色：暖深棕灰 + 低对比度米白
+   ============================================================ */
+@layer base {
+  :root {
+    /* ---- 浅色（默认）：原杂志风米色墨色 ---- */
+    --ink: 42 31 26;           /* #2A1F1A  墨色主文字 */
+    --ink-soft: 59 46 38;      /* #3B2E26  次级标题 */
+    --ink-muted: 92 74 62;     /* #5C4A3E  次要正文 */
+    --ink-faint: 138 120 104;  /* #8A7868  辅助/占位 */
+    --cream: 251 247 242;      /* #FBF7F2  主背景 */
+    --cream-warm: 244 236 224; /* #F4ECE0  卡片/玻璃 */
+    --cream-deep: 234 223 207; /* #EADFCF  图片区底 */
+    --cream-paper: 248 241 231;/* #F8F1E7  纸张卡片 */
+    --ember: 217 142 63;       /* #D98E3F  火苗主色 */
+    --ember-soft: 230 167 102; /* #E6A766  火苗浅 */
+    --ember-deep: 181 114 46;  /* #B5722E  火苗深 */
+    --ember-glow: 244 200 154; /* #F4C89A  火苗发光 */
+    --moss: 107 122 90;        /* #6B7A5A  苔藓绿 */
+    --clay: 168 98 58;         /* #A8623A  陶土橙棕 */
+    /* 阴影辅助（用于暗色下反转） */
+    --shadow-alpha-soft: 0.04;
+    --shadow-alpha-card: 0.25;
+    --shadow-alpha-lift: 0.45;
+    --shadow-alpha-glow: 0.35;
+    --shadow-ring-glow: 0.2;
+    --glass-bg-alpha: 0.6;
+  }
+
+  /* ---- OPPO Find X8 / ColorOS 风格暗色模式 ----
+     关键词：暖深棕灰（不是冷黑 #000）、暖米白文字（不是刺眼纯白）、
+     琥珀色保持原样（唯一暖色亮源）、阴影内收外柔、边框反转为极薄半透明白。 */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      /* 文字：暖米白系，4 级对比度（不是 #FFF 这种刺眼白） */
+      --ink: 234 223 209;       /* 原 cream-deep → 主文字色，Find X8 暗色文字感 */
+      --ink-soft: 216 202 185;  /* 次级正文（≈ 原 cream-warm 再淡一点） */
+      --ink-muted: 180 165 148; /* 次级辅助（原 ink-muted 的"淡灰"在暗底上反向暖淡灰） */
+      --ink-faint: 130 118 104; /* 占位/边框辅助（原 ink-faint 保留，但在暗底上仍可读） */
+      /* 背景：暖深棕灰梯度（Find X8 浏览器暗色感 ≈ #151311 起步） */
+      --cream: 21 19 17;        /* #151311  主背景：Find X8 典型暖深棕灰（不是#000也不是深蓝黑） */
+      --cream-warm: 30 27 24;   /* #1E1B18  卡片/玻璃：深一级，视觉上"卡片浮出来" */
+      --cream-deep: 38 33 29;   /* #26211D  图片区底：再亮一级，衬托图片暗部 */
+      --cream-paper: 26 23 21;  /* #1A1715  纸张卡片：与 cream 有级差 */
+      /* 琥珀色 & 辅助色：保持不变（唯一暖色亮源，就是暗底的视觉重心） */
+      --ember: 217 142 63;
+      --ember-soft: 230 167 102;
+      --ember-deep: 201 130 52; /* 暗底上再亮一丢丢不刺眼 */
+      --ember-glow: 244 200 154;
+      --moss: 124 139 104;      /* 苔藓绿暗底稍微提亮 */
+      --clay: 184 110 66;       /* 陶土暗底稍微提亮 */
+      /* 阴影：暗底 → 内投影明显、外投影要压暗 + 极低 alpha 外发光 */
+      --shadow-alpha-soft: 0.0;
+      --shadow-alpha-card: 0.55;
+      --shadow-alpha-lift: 0.7;
+      --shadow-alpha-glow: 0.5;
+      --shadow-ring-glow: 0.35;
+      --glass-bg-alpha: 0.35;   /* 暗底 glass 更透明，避免"一坨黑" */
+    }
+  }
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    color-scheme: light dark; /* 告诉浏览器：本页面两种配色都支持，滚动条/表单控件也自动用暗色 */
   }
 
   body {
     @apply bg-cream text-ink font-sans antialiased;
     text-rendering: optimizeLegibility;
     font-feature-settings: "ss01", "cv01", "cv11";
+    transition: background-color 400ms ease, color 400ms ease; /* 模式切换柔一点 */
   }
 
   /* 标题启用光学尺寸 + 衬线特性 */
@@ -230,6 +295,70 @@
   .reveal.is-visible {
     opacity: 1;
     transform: translateY(0);
+  }
+
+  /* ============ OPPO Find X8 暗色模式 专项适配 ============
+     上面的颜色 Tailwind 已经走 CSS 变量了，这里负责硬编码的纹理/玻璃/滚动条。 */
+  @media (prefers-color-scheme: dark) {
+    /* 滚动条：暗底暖棕灰风格（ColorOS 滚动条） */
+    ::-webkit-scrollbar-track {
+      background: rgb(var(--cream));
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgb(var(--ink-faint));
+      border: 2px solid rgb(var(--cream));
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgb(var(--ember));
+    }
+
+    /* Apple 玻璃质感：反向暗底玻璃（白底内光 + 暖灰毛玻璃） */
+    .glass {
+      background: rgb(var(--cream-warm) / var(--glass-bg-alpha));
+      border-color: rgb(var(--ink) / 0.06);
+      box-shadow:
+        0 1px 0 0 rgb(var(--ink) / 0.04) inset,
+        0 0 0 1px rgb(var(--ink) / 0.04),
+        0 12px 40px -10px rgb(0 0 0 / 0.45);
+    }
+    .glass-dark {
+      background: rgb(var(--ink) / 0.25);
+      border-color: rgb(var(--ink) / 0.12);
+      box-shadow:
+        0 1px 0 0 rgb(var(--ink) / 0.08) inset,
+        0 16px 52px -12px rgb(0 0 0 / 0.6);
+    }
+    .glass-warm {
+      background: rgb(var(--cream-deep) / 0.28);
+      border-color: rgb(var(--ember) / 0.12);
+      box-shadow:
+        0 1px 0 0 rgb(var(--ink) / 0.05) inset,
+        0 8px 32px -10px rgb(0 0 0 / 0.4);
+    }
+
+    /* 纸张噪点纹理：暗底 → 混合模式改成 overlay（multiply 在暗底上是黑） + 换成暖米白噪点 */
+    .grain::after {
+      mix-blend-mode: overlay;
+      opacity: 0.32;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.92 0 0 0 0 0.88 0 0 0 0 0.82 0 0 0 0.10 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* 纸张点阵纹理：暗底 → 点阵换成暖米白极低 alpha，不再是墨色 */
+    .paper-texture {
+      background-image:
+        radial-gradient(rgb(var(--ink) / 0.025) 1px, transparent 1px),
+        radial-gradient(rgb(var(--ink) / 0.015) 1px, transparent 1px);
+    }
+
+    /* 编辑主按钮：暗色下文字"text-cream"不能太接近新 cream 背景（会糊），强制改成ink */
+    .btn-primary {
+      color: rgb(var(--ink));
+    }
+
+    /* Reveal 入场：暗色稍微放大透明度反差，更容易看见 */
+    .reveal {
+      transform: translateY(20px);
+    }
   }
 
   .text-balance {

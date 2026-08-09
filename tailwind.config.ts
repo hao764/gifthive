@@ -8,27 +8,29 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // 设计稿核心配色 —— 深棕墨色 + 米色纸面 + 橙色火苗
+        // 🎯 所有颜色升级为 CSS 变量：支持 prefers-color-scheme 暗色一键切换
+        // 用法：colors.ink.DEFAULT = "rgb(var(--ink) / <alpha-value>)"，
+        // 这样 bg-ink/60、text-ink/85 这种 alpha 写法在明暗双色模式下都正确
         ink: {
-          DEFAULT: "#2A1F1A",
-          soft: "#3B2E26",
-          muted: "#5C4A3E",
-          faint: "#8A7868",
+          DEFAULT: "rgb(var(--ink) / <alpha-value>)",
+          soft: "rgb(var(--ink-soft) / <alpha-value>)",
+          muted: "rgb(var(--ink-muted) / <alpha-value>)",
+          faint: "rgb(var(--ink-faint) / <alpha-value>)",
         },
         cream: {
-          DEFAULT: "#FBF7F2",
-          warm: "#F4ECE0",
-          deep: "#EADFCF",
-          paper: "#F8F1E7",
+          DEFAULT: "rgb(var(--cream) / <alpha-value>)",
+          warm: "rgb(var(--cream-warm) / <alpha-value>)",
+          deep: "rgb(var(--cream-deep) / <alpha-value>)",
+          paper: "rgb(var(--cream-paper) / <alpha-value>)",
         },
         ember: {
-          DEFAULT: "#D98E3F",
-          soft: "#E6A766",
-          deep: "#B5722E",
-          glow: "#F4C89A",
+          DEFAULT: "rgb(var(--ember) / <alpha-value>)",
+          soft: "rgb(var(--ember-soft) / <alpha-value>)",
+          deep: "rgb(var(--ember-deep) / <alpha-value>)",
+          glow: "rgb(var(--ember-glow) / <alpha-value>)",
         },
-        moss: "#6B7A5A",
-        clay: "#A8623A",
+        moss: "rgb(var(--moss) / <alpha-value>)",
+        clay: "rgb(var(--clay) / <alpha-value>)",
       },
       fontFamily: {
         display: ["var(--font-display)", "Georgia", "serif"],
