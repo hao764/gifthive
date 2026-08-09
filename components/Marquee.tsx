@@ -46,7 +46,8 @@ export default function Marquee({
       className={`mask-fade-x overflow-hidden ${className}`}
       role="presentation"
     >
-      <div className="flex">
+      {/* 🎯 动画放在外层 flex 上：让两份 track 作为整体平移 -50%，实现无缝循环 */}
+      <div className="flex w-max animate-marquee">
         {row}
         {row}
       </div>

@@ -127,13 +127,20 @@
     @apply ml-6;
   }
 
-  /* 装饰跑马灯容器 */
+  /* 装饰跑马灯容器 — 动画直接在外层 flex（animate-marquee），不再在单个 track 上重复播放 */
   .marquee-track {
     @apply flex w-max items-center gap-0;
-    animation: marquee 40s linear infinite;
   }
-  .marquee-track:hover {
+  /* hover 时暂停：在最外层 mask-fade-x 内的动画 flex 上生效 */
+  .mask-fade-x:hover .animate-marquee {
     animation-play-state: paused;
+  }
+  /* 给跑马灯中的文字一条缓慢发光的微光移动路径，让它"更活" */
+  .mask-fade-x .marquee-track span.font-display {
+    transition: color 0.5s ease;
+  }
+  .mask-fade-x:hover .marquee-track span.font-display {
+    color: rgb(var(--ink) / 0.9) !important;
   }
 
   /* 标签药丸 —— 带前缀小点 */
